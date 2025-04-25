@@ -14,13 +14,15 @@ const renderTextWithLinks = (text, limit = null, isExpanded = false, handleLinkC
   // Преобразуем части в JSX
   const elements = parts.map((part, index) => {
     if (part.match(urlRegex)) {
+      const isChannelLink = part.match(/https:\/\/reelstgram-vite\.vercel\.app\/#\/channel\/([a-zA-Z0-9_-]+)\/post\/([0-9]+)/);
       return (
         <a
           key={index}
           href={part}
           onClick={(event) => handleLinkClick ? handleLinkClick(part, event) : null}
-          target="_blank"
-          rel="noopener noreferrer"
+          // Убираем target="_blank" для ссылок на каналы внутри приложения
+          target={isChannelLink ? undefined : "_blank"}
+          rel={isChannelLink ? undefined : "noopener noreferrer"}
           className="text-blue-400 underline hover:text-blue-300"
         >
           {part}

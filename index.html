@@ -7,11 +7,11 @@
     <title>Reelstgram</title>
     <!-- Подключаем Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Подключаем manifest.json для PWA -->
-    <link rel="manifest" href="/manifest.json" />
+    <!-- Подключаем manifest.json для PWA с параметром версии -->
+    <link rel="manifest" href="/manifest.json?v=4" />
     <!-- Иконки для PWA -->
-    <link rel="icon" href="/icon-192x192.png" />
-    <link rel="apple-touch-icon" href="/icon-192x192.png" />
+    <link rel="icon" href="/icon-192x192.png?v=4" />
+    <link rel="apple-touch-icon" href="/icon-192x192.png?v=4" />
   </head>
   <body>
     <div id="root">
@@ -22,19 +22,20 @@
       </div>
     </div>
     <script>
+      console.log("Index.html: Loaded at", new Date().toISOString());
+      console.log("Index.html: Current URL:", window.location.href);
       console.log("Index.html: Checking resource availability...");
-      // Проверяем доступность ресурсов
-      fetch('/manifest.json')
+      fetch('/manifest.json?v=4')
         .then(res => console.log('/manifest.json loaded:', res.status))
         .catch(err => console.error('Error loading /manifest.json:', err));
-      fetch('/icon-192x192.png')
+      fetch('/icon-192x192.png?v=4')
         .then(res => console.log('/icon-192x192.png loaded:', res.status))
         .catch(err => console.error('Error loading /icon-192x192.png:', err));
-      fetch('/sw.js')
+      fetch('/sw.js?v=4')
         .then(res => console.log('/sw.js loaded:', res.status))
         .catch(err => console.error('Error loading /sw.js:', err));
       console.log("Index.html: Attempting to load main.jsx...");
     </script>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.jsx?v=4"></script>
   </body>
 </html>

@@ -60,6 +60,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
   const [hasViewed, setHasViewed] = useState({});
   const [isChannelInfoOpen, setIsChannelInfoOpen] = useState(false);
   const [showSubscribePrompt, setShowSubscribePrompt] = useState(false);
+  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false); // Состояние для уведомления о правах
 
   useEffect(() => {
     const newChannel = channels.find((ch) => ch.uniqueId === uniqueId);
@@ -187,6 +188,14 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
       channel_id: uniqueId,
       channel_name: channel.name,
     });
+  };
+
+  const handleAddContentClick = () => {
+    if (canAddContent) {
+      onAddContent(channel);
+    } else {
+      setShowPermissionPrompt(true);
+    }
   };
 
   if (!channel) {
@@ -318,17 +327,15 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
             Back
           </button>
           <p className="text-white text-lg">No posts yet. Add some content!</p>
-          {canAddContent && (
-            <motion.button
-              onClick={() => onAddContent(channel)}
-              className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50 shadow-lg"
-              whileHover={{ scale: 1.1, boxShadow: "0px 0px 15px rgba(34, 197, 94, 0.5)" }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              Add Content
-            </motion.button>
-          )}
+          <motion.button
+            onClick={handleAddContentClick}
+            className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50 shadow-lg"
+            whileHover={{ scale: 1.1, boxShadow: "0px 0px 15px rgba(34, 197, 94, 0.5)" }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            Add Content
+          </motion.button>
         </div>
 
         <AnimatePresence>
@@ -349,6 +356,29 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
               >
                 Subscribe
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showPermissionPrompt && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 p-6 rounded-lg w-[400px] max-w-[90%] text-center z-50 shadow-lg"
+            >
+              <h2 className="text-xl font-semibold text-white mb-4">Permission Denied</h2>
+              <p className="text-gray-300 text-sm mb-4">
+                Only the channel owner or administrators can add content.
+              </p>
+              <button
+                onClick={() => setShowPermissionPrompt(false)}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                Close
               </button>
             </motion.div>
           )}
@@ -626,17 +656,15 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
             />
           </motion.div>
         </AnimatePresence>
-        {canAddContent && (
-          <motion.button
-            onClick={() => onAddContent(channel)}
-            className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50 shadow-lg"
-            whileHover={{ scale: 1.1, boxShadow: "0px 0px 15px rgba(34, 197, 94, 0.5)" }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            Add Content
-          </motion.button>
-        )}
+        <motion.button
+          onClick={handleAddContentClick}
+          className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50 shadow-lg"
+          whileHover={{ scale: 1.1, boxShadow: "0px 0px 15px rgba(34, 197, 94, 0.5)" }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          Add Content
+        </motion.button>
       </div>
 
       <AnimatePresence>
@@ -657,6 +685,29 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
               className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
             >
               Subscribe
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showPermissionPrompt && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 p-6 rounded-lg w-[400px] max-w-[90%] text-center z-50 shadow-lg"
+          >
+            <h2 className="text-xl font-semibold text-white mb-4">Permission Denied</h2>
+            <p className="text-gray-300 text-sm mb-4">
+              Only the channel owner or administrators can add content.
+            </p>
+            <button
+              onClick={() => setShowPermissionPrompt(false)}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+            >
+              Close
             </button>
           </motion.div>
         )}

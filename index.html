@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reelstagram</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>Reelstgram</title>
+    <!-- Подключаем Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Подключаем manifest.json для PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <!-- Иконки для PWA -->
+    <link rel="icon" href="/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="/icon-192x192.png" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script>
-      // Перенаправляем с /login на #/login
-      if (window.location.pathname !== '/' && !window.location.hash) {
-        window.location.href = window.location.origin + '/#' + window.location.pathname;
-      }
-    </script>
   </body>
 </html>

@@ -78,7 +78,7 @@ app.get('/test', (req, res) => {
 });
 
 // Маршрут для загрузки файлов
-app.post('/upload', (req, res, next) => {
+app.post('/api/upload', (req, res, next) => {
   console.log('Received upload request');
   upload.single('file')(req, res, (err) => {
     if (err) {

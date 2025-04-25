@@ -40,8 +40,8 @@ export default async function handler(req, res) {
 
     // Загружаем файл в Cloudinary
     const result = await cloudinary.uploader.upload(file.filepath, {
-      folder: 'reelstgram-vite', // Папка в Cloudinary
-      resource_type: 'auto', // Автоматическое определение типа (image/video)
+      folder: 'reelstgram-vite',
+      resource_type: 'auto',
     });
 
     res.status(200).json({ url: result.secure_url });

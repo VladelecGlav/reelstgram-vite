@@ -4,10 +4,7 @@ import { motion } from 'framer-motion';
 const renderTextWithLinks = (text) => {
   if (!text) return null;
 
-  // Регулярное выражение для поиска URL
   const urlRegex = /(https?:\/\/[^\s]+)/g;
-
-  // Разбиваем текст на части: обычный текст и ссылки
   const parts = text.split(urlRegex);
 
   return parts.map((part, index) => {
@@ -28,7 +25,7 @@ const renderTextWithLinks = (text) => {
   });
 };
 
-export default function ChannelList({ channels, handleSelectChannel, setShowCreateChannel, onOpenMenu, handleToggleSubscription }) {
+export default function ChannelList({ channels, handleSelectChannel, setShowCreateChannel, onOpenMenu, handleToggleSubscription, user }) {
   const copyChannelLink = async (channel) => {
     const channelLink = `${window.location.origin}/#/channel/${channel.uniqueId}/post/0`;
     try {
@@ -48,13 +45,13 @@ export default function ChannelList({ channels, handleSelectChannel, setShowCrea
       >
         ☰
       </button>
-      <h2 className="text-2xl font-bold text-white mb-4">Channels</h2>
-      {channels.filter((channel) => channel.subscribed).length === 0 ? (
+      <h1 className="text-white text-2xl mb-4">Welcome, {user.username}!</h1>
+      {channels.filter((channel) => user.subscribedChannels.includes(channel.uniqueId)).length === 0 ? (
         <p className="text-gray-400 mb-4">No subscribed channels yet.</p>
       ) : (
         <div className="space-y-2">
           {channels
-            .filter((channel) => channel.subscribed)
+            .filter((channel) => user.subscribedChannels.includes(channel.uniqueId))
             .map((channel) => (
               <div key={channel.uniqueId} className="flex items-center justify-between bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-64">
                 <motion.button
@@ -87,13 +84,13 @@ export default function ChannelList({ channels, handleSelectChannel, setShowCrea
                   <button
                     onClick={() => handleToggleSubscription(channel.uniqueId)}
                     className={`px-2 py-1 rounded text-sm ${
-                      channel.subscribed
+                      user.subscribedChannels.includes(channel.uniqueId)
                         ? 'bg-red-500 hover:bg-red-600'
                         : 'bg-green-500 hover:bg-green-600'
                     }`}
-                    title={channel.subscribed ? 'Unsubscribe' : 'Subscribe'}
+                    title={user.subscribedChannels.includes(channel.uniqueId) ? 'Unsubscribe' : 'Subscribe'}
                   >
-                    {channel.subscribed ? 'Unsub' : 'Sub'}
+                    {user.subscribedChannels.includes(channel.uniqueId) ? 'Unsub' : 'Sub'}
                   </button>
                   <button
                     onClick={() => copyChannelLink(channel)}

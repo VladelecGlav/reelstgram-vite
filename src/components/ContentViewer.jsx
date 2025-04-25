@@ -8,10 +8,7 @@ import Post from './Post';
 const renderTextWithLinks = (text) => {
   if (!text) return 'No description available.';
 
-  // Регулярное выражение для поиска URL
   const urlRegex = /(https?:\/\/[^\s]+)/g;
-
-  // Разбиваем текст на части: обычный текст и ссылки
   const parts = text.split(urlRegex);
 
   return parts.map((part, index) => {
@@ -51,7 +48,7 @@ const sendGA4Event = (eventName, params) => {
   }
 };
 
-export default function ContentViewer({ channels, onBack, onLike, onView, onOpenMenu, onAddContent, onOpenSettings, handleToggleSubscription }) {
+export default function ContentViewer({ channels, onBack, onLike, onView, onOpenMenu, onAddContent, onOpenSettings, handleToggleSubscription, user }) {
   const { uniqueId, postId } = useParams();
   const navigate = useNavigate();
 
@@ -79,7 +76,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
         }
       }
       // Проверяем, подписан ли пользователь, и показываем уведомление, если не подписан
-      setShowSubscribePrompt(!newChannel.subscribed);
+      setShowSubscribePrompt(!user.subscribedChannels.includes(newChannel.uniqueId));
 
       // Логируем событие перехода по ссылке
       logAnalyticsEvent('link_click', {
@@ -94,7 +91,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
         channel_name: newChannel.name,
       });
     }
-  }, [channels, uniqueId, postId, navigate]);
+  }, [channels, uniqueId, postId, navigate, user]);
 
   useEffect(() => {
     if (channel?.posts?.length > 0) {
@@ -297,12 +294,12 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
                   closeChannelInfo();
                 }}
                 className={`mt-2 px-4 py-2 rounded text-white ${
-                  channel.subscribed
+                  user.subscribedChannels.includes(channel.uniqueId)
                     ? 'bg-red-500 hover:bg-red-600'
                     : 'bg-green-500 hover:bg-green-600'
                 }`}
               >
-                {channel.subscribed ? 'Unsubscribe' : 'Subscribe'}
+                {user.subscribedChannels.includes(channel.uniqueId) ? 'Unsubscribe' : 'Subscribe'}
               </button>
             </div>
           </div>
@@ -443,12 +440,12 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
                   closeChannelInfo();
                 }}
                 className={`mt-2 px-4 py-2 rounded text-white ${
-                  channel.subscribed
+                  user.subscribedChannels.includes(channel.uniqueId)
                     ? 'bg-red-500 hover:bg-red-600'
                     : 'bg-green-500 hover:bg-green-600'
                 }`}
               >
-                {channel.subscribed ? 'Unsubscribe' : 'Subscribe'}
+                {user.subscribedChannels.includes(channel.uniqueId) ? 'Unsubscribe' : 'Subscribe'}
               </button>
             </div>
           </div>
@@ -488,16 +485,16 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
   const variants = {
     initial: (direction) => ({
       y: direction > 0 ? '100%' : '-100%',
-      opacity: 0, // Добавляем затухание
+      opacity: 0,
     }),
     animate: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }, // Быстрее и с кастомным easing
+      transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
     },
     exit: (direction) => ({
       y: direction > 0 ? '-100%' : '100%',
-      opacity: 0, // Добавляем затухание
+      opacity: 0,
       transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
     }),
   };
@@ -583,12 +580,12 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
                 closeChannelInfo();
               }}
               className={`mt-2 px-4 py-2 rounded text-white ${
-                channel.subscribed
+                user.subscribedChannels.includes(channel.uniqueId)
                   ? 'bg-red-500 hover:bg-red-600'
                   : 'bg-green-500 hover:bg-green-600'
               }`}
             >
-              {channel.subscribed ? 'Unsubscribe' : 'Subscribe'}
+              {user.subscribedChannels.includes(channel.uniqueId) ? 'Unsubscribe' : 'Subscribe'}
             </button>
           </div>
         </div>

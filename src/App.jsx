@@ -7,6 +7,7 @@ import CreateChannel from './components/CreateChannel';
 import AddContent from './components/AddContent';
 import ContentViewer from './components/ContentViewer';
 import ChannelSettings from './components/ChannelSettings';
+import UserProfile from './components/UserProfile'; // Новый компонент
 
 function AppContent() {
   console.log("Step 4: App component initialized.");
@@ -17,24 +18,59 @@ function AppContent() {
   const [showAddContent, setShowAddContent] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showChannelSettings, setShowChannelSettings] = useState(null);
+  const [user, setUser] = useState(null); // Состояние для пользователя
 
   const navigate = useNavigate();
 
-  // Инициализация Telegram Web App
+  // Инициализация Telegram Web App и получение данных пользователя
   useEffect(() => {
+    let userId, username;
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.ready();
       console.log('Telegram Web App initialized');
       const initData = window.Telegram.WebApp.initDataUnsafe;
       const startParam = initData?.start_param;
+      userId = initData?.user?.id?.toString() || 'default-user';
+      username = initData?.user?.username || 'Anonymous';
 
       if (startParam && startParam.startsWith('channel_')) {
         const channelId = startParam.replace('channel_', '');
         console.log('Opening channel from Telegram start param:', channelId);
         navigate(`/channel/${channelId}/post/0`);
       }
+    } else {
+      // Локальная авторизация для тестирования
+      userId = localStorage.getItem('userId') || 'default-user';
+      username = localStorage.getItem('username') || 'Anonymous';
+      localStorage.setItem('userId', userId);
+      localStorage.setItem('username', username);
     }
+
+    // Загружаем профиль пользователя из localStorage
+    const savedUsers = JSON.parse(localStorage.getItem('users')) || {};
+    if (!savedUsers[userId]) {
+      savedUsers[userId] = {
+        username,
+        avatar: '',
+        subscribedChannels: [],
+      };
+    }
+    localStorage.setItem('users', JSON.stringify(savedUsers));
+    setUser({ userId, ...savedUsers[userId] });
   }, [navigate]);
+
+  // Сохранение профиля пользователя при изменении
+  useEffect(() => {
+    if (user) {
+      const savedUsers = JSON.parse(localStorage.getItem('users')) || {};
+      savedUsers[user.userId] = {
+        username: user.username,
+        avatar: user.avatar,
+        subscribedChannels: user.subscribedChannels,
+      };
+      localStorage.setItem('users', JSON.stringify(savedUsers));
+    }
+  }, [user]);
 
   useEffect(() => {
     console.log("Step 5: Loading channels from localStorage...");
@@ -57,7 +93,7 @@ function AppContent() {
               { text: "Join Chat", url: "https://t.me/examplechat" },
             ],
           };
-          console.log("Post buttons after update:", updatedPost.buttons); // Отладка
+          console.log("Post buttons after update:", updatedPost.buttons);
           return updatedPost;
         }),
       }));
@@ -90,6 +126,12 @@ function AppContent() {
     setChannels([...channels, newChannel]);
     setShowCreateChannel(false);
     setIsMenuOpen(false);
+
+    // Добавляем канал в подписки пользователя
+    setUser((prevUser) => ({
+      ...prevUser,
+      subscribedChannels: [...prevUser.subscribedChannels, newChannel.uniqueId],
+    }));
   };
 
   const handleAddContent = (channel, content) => {
@@ -174,16 +216,24 @@ function AppContent() {
         : ch
     );
     setChannels(updatedChannels);
+
+    // Обновляем подписки пользователя
+    setUser((prevUser) => {
+      const subscribedChannels = prevUser.subscribedChannels.includes(channelUniqueId)
+        ? prevUser.subscribedChannels.filter((id) => id !== channelUniqueId)
+        : [...prevUser.subscribedChannels, channelUniqueId];
+      return { ...prevUser, subscribedChannels };
+    });
   };
 
   const handleOpenSettings = (channel) => {
     setShowChannelSettings(channel);
   };
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-black">
-        <p className="text-white text-lg">Loading channels...</p>
+        <p className="text-white text-lg">Loading...</p>
       </div>
     );
   }
@@ -210,6 +260,12 @@ function AppContent() {
                 </button>
               </div>
               <button
+                onClick={() => navigate('/profile')}
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded mb-4"
+              >
+                Profile
+              </button>
+              <button
                 onClick={() => setShowCreateChannel(true)}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mb-4"
               >
@@ -221,7 +277,7 @@ function AppContent() {
               ) : (
                 <ul className="space-y-2">
                   {channels
-                    .filter((channel) => channel.subscribed)
+                    .filter((channel) => user.subscribedChannels.includes(channel.uniqueId))
                     .map((channel) => (
                       <li key={channel.uniqueId} className="flex items-center justify-between">
                         <button
@@ -294,6 +350,7 @@ function AppContent() {
                 setShowCreateChannel={setShowCreateChannel}
                 onOpenMenu={() => setIsMenuOpen(true)}
                 handleToggleSubscription={handleToggleSubscription}
+                user={user}
               />
             }
           />
@@ -309,6 +366,18 @@ function AppContent() {
                 onAddContent={(channel) => setShowAddContent(channel)}
                 onOpenSettings={handleOpenSettings}
                 handleToggleSubscription={handleToggleSubscription}
+                user={user}
+              />
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <UserProfile
+                user={user}
+                setUser={setUser}
+                channels={channels}
+                onOpenMenu={() => setIsMenuOpen(true)}
               />
             }
           />

@@ -28,12 +28,30 @@ const renderTextWithLinks = (text) => {
 export default function ChannelList({ channels, handleSelectChannel, setShowCreateChannel, onOpenMenu, handleToggleSubscription, user }) {
   const copyChannelLink = async (channel) => {
     const channelLink = `${window.location.origin}/#/channel/${channel.uniqueId}/post/0`;
+    const telegramLink = `t.me/MyMiniAppBot?start=channel_${channel.uniqueId}`;
+    
     try {
-      await navigator.clipboard.writeText(channelLink);
-      alert('Channel link copied to clipboard!');
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.openLink(telegramLink);
+        console.log('Opening Telegram link inside Mini App:', telegramLink);
+      } else {
+        await navigator.clipboard.writeText(channelLink);
+        alert('Channel link copied to clipboard!');
+      }
     } catch (err) {
       console.error('Failed to copy link:', err);
       alert('Failed to copy link. Please copy it manually: ' + channelLink);
+    }
+  };
+
+  const shareChannelLink = (channel) => {
+    const telegramLink = `t.me/MyMiniAppBot?start=channel_${channel.uniqueId}`;
+    
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(telegramLink)}&text=Check out this channel: ${channel.name}`);
+      console.log('Sharing Telegram link:', telegramLink);
+    } else {
+      alert('Sharing is only available in Telegram Mini App.');
     }
   };
 
@@ -120,6 +138,13 @@ export default function ChannelList({ channels, handleSelectChannel, setShowCrea
                       title="Copy channel link"
                     >
                       🔗
+                    </button>
+                    <button
+                      onClick={() => shareChannelLink(channel)}
+                      className="px-2 py-1 rounded text-sm bg-purple-500 hover:bg-purple-600"
+                      title="Share channel"
+                    >
+                      📤
                     </button>
                   </div>
                 </motion.div>

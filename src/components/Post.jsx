@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Утилита для преобразования текста с URL в кликабельные ссылки
-const renderTextWithLinks = (text, limit = null, isExpanded = false) => {
+const renderTextWithLinks = (text, limit = null, isExpanded = false, handleLinkClick = null) => {
   if (!text) return '';
 
   // Регулярное выражение для поиска URL
@@ -18,6 +18,7 @@ const renderTextWithLinks = (text, limit = null, isExpanded = false) => {
         <a
           key={index}
           href={part}
+          onClick={(event) => handleLinkClick ? handleLinkClick(part, event) : null}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-400 underline hover:text-blue-300"
@@ -65,7 +66,7 @@ const renderTextWithLinks = (text, limit = null, isExpanded = false) => {
   return elements;
 };
 
-export default function Post({ post, channelId, onLike }) {
+export default function Post({ post, channelId, onLike, navigate }) {
   const videoRef = useRef(null);
   const [loadError, setLoadError] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -210,13 +211,29 @@ export default function Post({ post, channelId, onLike }) {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const relativeUrl = post.url; // Убираем замену localhost, так как URL уже относительный
+  const handleLinkClick = (url, event) => {
+    event.preventDefault();
+    const channelLinkRegex = /https:\/\/reelstgram-vite\.vercel\.app\/#\/channel\/([a-zA-Z0-9_-]+)\/post\/([0-9]+)/;
+    const match = url.match(channelLinkRegex);
+    
+    if (match) {
+      const channelUniqueId = match[1];
+      const postId = match[2];
+      console.log('Navigating to channel:', channelUniqueId, 'post:', postId);
+      navigate(`/channel/${channelUniqueId}/post/${postId}`);
+    } else {
+      // Для других ссылок открываем в новой вкладке
+      window.open(url, '_blank');
+    }
+  };
+
+  const relativeUrl = post.url;
   console.log('Post.jsx: Attempting to load media from:', relativeUrl);
   console.log('Post.jsx: Post buttons:', post.buttons);
 
   const captionLimit = 50;
   const isLongCaption = post.caption.length > captionLimit;
-  const displayedCaption = renderTextWithLinks(post.caption, captionLimit, isExpanded);
+  const displayedCaption = renderTextWithLinks(post.caption, captionLimit, isExpanded, handleLinkClick);
 
   if (loadError) {
     return (

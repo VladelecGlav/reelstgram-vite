@@ -19,7 +19,7 @@ function AppContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showChannelSettings, setShowChannelSettings] = useState(null);
   const [user, setUser] = useState(null);
-  const [allUsers, setAllUsers] = useState([]); // Список всех пользователей
+  const [allUsers, setAllUsers] = useState([]);
 
   const navigate = useNavigate();
 
@@ -39,7 +39,9 @@ function AppContent() {
         if (startParam && startParam.startsWith('channel_')) {
           const channelId = startParam.replace('channel_', '');
           console.log('Opening channel from Telegram start param:', channelId);
-          navigate(`/channel/${channelId}/post/0`);
+          navigate(`/channel/${channelId}/post/0`, { replace: true });
+        } else {
+          console.log('No start_param provided or invalid format:', startParam);
         }
       } else {
         console.log("Step 2: Telegram Web App not detected, using local user...");
@@ -61,7 +63,6 @@ function AppContent() {
       localStorage.setItem('users', JSON.stringify(savedUsers));
       setUser({ userId, ...savedUsers[userId] });
 
-      // Загружаем список всех пользователей
       const usersList = Object.entries(savedUsers).map(([id, userData]) => ({
         userId: id,
         username: userData.username,
@@ -83,7 +84,6 @@ function AppContent() {
       };
       localStorage.setItem('users', JSON.stringify(savedUsers));
 
-      // Обновляем список всех пользователей
       const usersList = Object.entries(savedUsers).map(([id, userData]) => ({
         userId: id,
         username: userData.username,
@@ -408,6 +408,7 @@ function AppContent() {
                 onOpenSettings={handleOpenSettings}
                 handleToggleSubscription={handleToggleSubscription}
                 user={user}
+                navigate={navigate} // Передаём navigate для обработки ссылок
               />
             }
           />
@@ -487,7 +488,7 @@ function AppContent() {
               channel={showChannelSettings}
               onSave={handleUpdateChannel}
               onCancel={() => setShowChannelSettings(null)}
-              allUsers={allUsers} // Передаём список всех пользователей
+              allUsers={allUsers}
             />
           </motion.div>
         )}

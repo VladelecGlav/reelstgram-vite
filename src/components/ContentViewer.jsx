@@ -48,9 +48,9 @@ const sendGA4Event = (eventName, params) => {
   }
 };
 
-export default function ContentViewer({ channels, onBack, onLike, onView, onOpenMenu, onAddContent, onOpenSettings, handleToggleSubscription, user }) {
+export default function ContentViewer({ channels, onBack, onLike, onView, onOpenMenu, onAddContent, onOpenSettings, handleToggleSubscription, user, navigate }) {
   const { uniqueId, postId } = useParams();
-  const navigate = useNavigate();
+  const localNavigate = useNavigate();
 
   const channel = channels.find((ch) => ch.uniqueId === uniqueId);
   const initialIndex = channel?.posts?.findIndex((post) => post.id === parseInt(postId)) || 0;
@@ -60,7 +60,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
   const [hasViewed, setHasViewed] = useState({});
   const [isChannelInfoOpen, setIsChannelInfoOpen] = useState(false);
   const [showSubscribePrompt, setShowSubscribePrompt] = useState(false);
-  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false); // Состояние для уведомления о правах
+  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
 
   useEffect(() => {
     const newChannel = channels.find((ch) => ch.uniqueId === uniqueId);
@@ -71,9 +71,9 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
       } else {
         setCurrentIndex(0);
         if (newChannel.posts.length > 0) {
-          navigate(`/channel/${newChannel.uniqueId}/post/${newChannel.posts[0].id}`);
+          localNavigate(`/channel/${newChannel.uniqueId}/post/${newChannel.posts[0].id}`);
         } else {
-          navigate(`/channel/${newChannel.uniqueId}/post/0`);
+          localNavigate(`/channel/${newChannel.uniqueId}/post/0`);
         }
       }
       setShowSubscribePrompt(!user.subscribedChannels.includes(newChannel.uniqueId));
@@ -89,7 +89,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
         channel_name: newChannel.name,
       });
     }
-  }, [channels, uniqueId, postId, navigate, user]);
+  }, [channels, uniqueId, postId, localNavigate, user]);
 
   useEffect(() => {
     if (channel?.posts?.length > 0) {
@@ -109,7 +109,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
         setDirection(1);
         const nextIndex = currentIndex + 1;
         setCurrentIndex(nextIndex);
-        navigate(`/channel/${uniqueId}/post/${channel.posts[nextIndex].id}`);
+        localNavigate(`/channel/${uniqueId}/post/${channel.posts[nextIndex].id}`);
       }
     },
     onSwipedDown: () => {
@@ -117,7 +117,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
         setDirection(-1);
         const prevIndex = currentIndex - 1;
         setCurrentIndex(prevIndex);
-        navigate(`/channel/${uniqueId}/post/${channel.posts[prevIndex].id}`);
+        localNavigate(`/channel/${uniqueId}/post/${channel.posts[prevIndex].id}`);
       }
     },
     trackMouse: true,
@@ -134,13 +134,13 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
         setDirection(1);
         const nextIndex = currentIndex + 1;
         setCurrentIndex(nextIndex);
-        navigate(`/channel/${uniqueId}/post/${channel.posts[nextIndex].id}`);
+        localNavigate(`/channel/${uniqueId}/post/${channel.posts[nextIndex].id}`);
       } else if (event.deltaY < -threshold && currentIndex > 0) {
         setCanScroll(false);
         setDirection(-1);
         const prevIndex = currentIndex - 1;
         setCurrentIndex(prevIndex);
-        navigate(`/channel/${uniqueId}/post/${channel.posts[prevIndex].id}`);
+        localNavigate(`/channel/${uniqueId}/post/${channel.posts[prevIndex].id}`);
       }
     };
 
@@ -149,7 +149,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
     return () => {
       window.removeEventListener('wheel', handleWheel);
     };
-  }, [currentIndex, canScroll, channel?.posts, uniqueId, navigate]);
+  }, [currentIndex, canScroll, channel?.posts, uniqueId, localNavigate]);
 
   const handleAnimationComplete = () => {
     setCanScroll(true);
@@ -165,12 +165,24 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
 
   const copyChannelLink = async () => {
     const channelLink = `${window.location.origin}/#/channel/${uniqueId}/post/0`;
+    
     try {
       await navigator.clipboard.writeText(channelLink);
       alert('Channel link copied to clipboard!');
     } catch (err) {
       console.error('Failed to copy link:', err);
       alert('Failed to copy link. Please copy it manually: ' + channelLink);
+    }
+  };
+
+  const shareChannelLink = () => {
+    const telegramLink = `t.me/MyMiniAppBot?start=channel_${uniqueId}`;
+    
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(telegramLink)}&text=Check out this channel: ${channel.name}`);
+      console.log('Sharing Telegram link:', telegramLink);
+    } else {
+      alert('Sharing is only available in Telegram Mini App.');
     }
   };
 
@@ -204,7 +216,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
         <div className="pt-20 h-screen flex flex-col items-center justify-center">
           <p className="text-white text-lg mb-4">Channel not found.</p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => localNavigate('/')}
             className="bg-blue-500 text-white px-4 py-2 rounded"
           >
             Go to Home
@@ -214,7 +226,6 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
     );
   }
 
-  // Проверяем, является ли пользователь владельцем или администратором
   const canAddContent = channel.ownerId === user.userId || (channel.admins && channel.admins.includes(user.userId));
 
   if (parseInt(postId) === 0 && channel.posts.length === 0) {
@@ -292,6 +303,12 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
                 className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-2"
               >
                 Copy Channel Link
+              </button>
+              <button
+                onClick={shareChannelLink}
+                className="mt-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded mr-2"
+              >
+                Share Channel
               </button>
               <button
                 onClick={() => {
@@ -379,129 +396,6 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
                 className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
               >
                 Close
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
-
-  if (!channel.posts[currentIndex]) {
-    return (
-      <div className="h-screen flex flex-col items-center justify-center bg-black">
-        <div
-          onClick={toggleChannelInfo}
-          className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-gray-900 shadow-lg z-50 w-[720px] border-b border-gray-700 cursor-pointer"
-        >
-          <div className="flex items-center p-4">
-            {channel.avatar ? (
-              <img
-                src={channel.avatar}
-                alt={`${channel.name} avatar`}
-                className="w-14 h-14 rounded-full object-cover mr-4 border-2 border-gray-600"
-              />
-            ) : (
-              <div className="w-14 h-14 rounded-full bg-gray-600 flex items-center justify-center mr-4 border-2 border-gray-500">
-                <span className="text-white text-2xl">{channel.name[0]}</span>
-              </div>
-            )}
-            <div>
-              <h2 className="text-2xl font-semibold text-white">{channel.name}</h2>
-              <p className="text-gray-300 text-sm">{channel.subscribers.toLocaleString()} subscribers</p>
-            </div>
-          </div>
-        </div>
-
-        {isChannelInfoOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-            onClick={closeChannelInfo}
-          >
-            <div
-              className="bg-gray-900 p-6 rounded-lg w-[400px] max-w-[90%] relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={closeChannelInfo}
-                className="absolute top-3 right-3 text-gray-400 hover:text-white"
-              >
-                ✕
-              </button>
-              <button
-                onClick={() => {
-                  onOpenSettings(channel);
-                  closeChannelInfo();
-                }}
-                className="absolute top-3 right-10 text-gray-400 hover:text-white"
-              >
-                ⚙️
-              </button>
-              <div className="flex items-center mb-4">
-                {channel.avatar ? (
-                  <img
-                    src={channel.avatar}
-                    alt={`${channel.name} avatar`}
-                    className="w-12 h-12 rounded-full object-cover mr-4 border-2 border-gray-600"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center mr-4 border-2 border-gray-500">
-                    <span className="text-white text-xl">{channel.name[0]}</span>
-                  </div>
-                )}
-                <h2 className="text-xl font-semibold text-white">{channel.name}</h2>
-              </div>
-              <p className="text-gray-300 text-sm mb-4">
-                {renderTextWithLinks(channel.description)}
-              </p>
-              <p className="text-gray-400 text-sm mb-4">
-                {channel.subscribers.toLocaleString()} subscribers
-              </p>
-              <button
-                onClick={copyChannelLink}
-                className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-2"
-              >
-                Copy Channel Link
-              </button>
-              <button
-                onClick={() => {
-                  handleToggleSubscription(channel.uniqueId);
-                  closeChannelInfo();
-                }}
-                className={`mt-2 px-4 py-2 rounded text-white ${
-                  user.subscribedChannels.includes(channel.uniqueId)
-                    ? 'bg-red-500 hover:bg-red-600'
-                    : 'bg-green-500 hover:bg-green-600'
-                }`}
-              >
-                {user.subscribedChannels.includes(channel.uniqueId) ? 'Unsubscribe' : 'Subscribe'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="pt-20 h-screen flex flex-col items-center justify-center">
-          <p className="text-white text-lg">Post not found.</p>
-        </div>
-
-        <AnimatePresence>
-          {showSubscribePrompt && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 p-6 rounded-lg w-[400px] max-w-[90%] text-center z-50 shadow-lg"
-            >
-              <h2 className="text-xl font-semibold text-white mb-4">Subscribe to {channel.name}</h2>
-              <p className="text-gray-300 text-sm mb-4">
-                Subscribe to see the content of this channel.
-              </p>
-              <button
-                onClick={handleSubscribe}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-              >
-                Subscribe
               </button>
             </motion.div>
           )}
@@ -603,6 +497,12 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
               Copy Channel Link
             </button>
             <button
+              onClick={shareChannelLink}
+              className="mt-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded mr-2"
+            >
+              Share Channel
+            </button>
+            <button
               onClick={() => {
                 handleToggleSubscription(channel.uniqueId);
                 closeChannelInfo();
@@ -653,6 +553,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
               post={channel.posts[currentIndex]}
               channelId={channel.uniqueId}
               onLike={() => onLike(channel.posts[currentIndex].id, uniqueId)}
+              navigate={navigate}
             />
           </motion.div>
         </AnimatePresence>

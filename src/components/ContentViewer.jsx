@@ -205,6 +205,9 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
     );
   }
 
+  // Проверяем, является ли пользователь владельцем или администратором
+  const canAddContent = channel.ownerId === user.userId || (channel.admins && channel.admins.includes(user.userId));
+
   if (parseInt(postId) === 0 && channel.posts.length === 0) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-black">
@@ -315,7 +318,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
             Back
           </button>
           <p className="text-white text-lg">No posts yet. Add some content!</p>
-          {channel.ownerId === user.userId && (
+          {canAddContent && (
             <motion.button
               onClick={() => onAddContent(channel)}
               className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50 shadow-lg"
@@ -623,7 +626,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
             />
           </motion.div>
         </AnimatePresence>
-        {channel.ownerId === user.userId && (
+        {canAddContent && (
           <motion.button
             onClick={() => onAddContent(channel)}
             className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50 shadow-lg"

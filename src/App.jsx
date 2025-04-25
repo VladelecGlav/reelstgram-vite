@@ -24,41 +24,49 @@ function AppContent() {
 
   // Инициализация Telegram Web App и получение данных пользователя
   useEffect(() => {
+    console.log("Step 1: Initializing Telegram Web App...");
     let userId, username;
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.ready();
-      console.log('Telegram Web App initialized');
-      const initData = window.Telegram.WebApp.initDataUnsafe;
-      const startParam = initData?.start_param;
-      userId = initData?.user?.id?.toString() || 'default-user';
-      username = initData?.user?.username || 'Anonymous';
+    try {
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.ready();
+        console.log('Telegram Web App initialized');
+        const initData = window.Telegram.WebApp.initDataUnsafe;
+        const startParam = initData?.start_param;
+        userId = initData?.user?.id?.toString() || 'default-user';
+        username = initData?.user?.username || 'Anonymous';
 
-      if (startParam && startParam.startsWith('channel_')) {
-        const channelId = startParam.replace('channel_', '');
-        console.log('Opening channel from Telegram start param:', channelId);
-        navigate(`/channel/${channelId}/post/0`);
+        if (startParam && startParam.startsWith('channel_')) {
+          const channelId = startParam.replace('channel_', '');
+          console.log('Opening channel from Telegram start param:', channelId);
+          navigate(`/channel/${channelId}/post/0`);
+        }
+      } else {
+        console.log("Step 2: Telegram Web App not detected, using local user...");
+        userId = localStorage.getItem('userId') || 'default-user';
+        username = localStorage.getItem('username') || 'Anonymous';
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('username', username);
       }
-    } else {
-      userId = localStorage.getItem('userId') || 'default-user';
-      username = localStorage.getItem('username') || 'Anonymous';
-      localStorage.setItem('userId', userId);
-      localStorage.setItem('username', username);
-    }
 
-    const savedUsers = JSON.parse(localStorage.getItem('users')) || {};
-    if (!savedUsers[userId]) {
-      savedUsers[userId] = {
-        username,
-        avatar: '',
-        subscribedChannels: [],
-      };
+      console.log("Step 3: Loading user profile from localStorage...");
+      const savedUsers = JSON.parse(localStorage.getItem('users')) || {};
+      if (!savedUsers[userId]) {
+        savedUsers[userId] = {
+          username,
+          avatar: '',
+          subscribedChannels: [],
+        };
+      }
+      localStorage.setItem('users', JSON.stringify(savedUsers));
+      setUser({ userId, ...savedUsers[userId] });
+    } catch (error) {
+      console.error("Error initializing Telegram Web App or user:", error);
     }
-    localStorage.setItem('users', JSON.stringify(savedUsers));
-    setUser({ userId, ...savedUsers[userId] });
   }, [navigate]);
 
   useEffect(() => {
     if (user) {
+      console.log("Step 4: Saving user profile to localStorage...");
       const savedUsers = JSON.parse(localStorage.getItem('users')) || {};
       savedUsers[user.userId] = {
         username: user.username,
@@ -80,7 +88,8 @@ function AppContent() {
         uniqueId: channel.uniqueId || nanoid(8),
         subscribed: channel.subscribed ?? false,
         subscribers: channel.subscribers ?? Math.floor(Math.random() * 4900) + 100,
-        ownerId: channel.ownerId || 'default-user', // Добавляем ownerId, если его нет
+        ownerId: channel.ownerId || 'default-user',
+        admins: channel.admins || [channel.ownerId || 'default-user'], // Добавляем поле admins
         posts: channel.posts.map((post) => {
           const updatedPost = {
             ...post,
@@ -119,7 +128,8 @@ function AppContent() {
       avatar: '',
       subscribed: true,
       subscribers: Math.floor(Math.random() * 4900) + 100,
-      ownerId: user.userId, // Устанавливаем текущего пользователя как владельца
+      ownerId: user.userId,
+      admins: [user.userId], // Изначально только владелец является админом
       posts: [],
     };
     setChannels([...channels, newChannel]);
@@ -190,7 +200,7 @@ function AppContent() {
     console.log("Updating channel:", updatedChannel);
     const updatedChannels = channels.map((ch) =>
       ch.uniqueId === updatedChannel.uniqueId
-        ? { ...ch, description: updatedChannel.description, avatar: updatedChannel.avatar }
+        ? { ...ch, description: updatedChannel.description, avatar: updatedChannel.avatar, admins: updatedChannel.admins }
         : ch
     );
     setChannels(updatedChannels);
@@ -228,6 +238,7 @@ function AppContent() {
   };
 
   if (isLoading || !user) {
+    console.log("Step 8: Rendering loading state...");
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-black">
         <p className="text-white text-lg">Loading...</p>
@@ -235,6 +246,7 @@ function AppContent() {
     );
   }
 
+  console.log("Step 9: Rendering main app content...");
   return (
     <div className="font-sans relative">
       <AnimatePresence>
@@ -452,6 +464,7 @@ function AppContent() {
 }
 
 export default function App() {
+  console.log("Step 0: Rendering App component...");
   return (
     <Router>
       <AppContent />

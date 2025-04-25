@@ -19,6 +19,7 @@ function AppContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showChannelSettings, setShowChannelSettings] = useState(null);
   const [user, setUser] = useState(null);
+  const [allUsers, setAllUsers] = useState([]); // Список всех пользователей
 
   const navigate = useNavigate();
 
@@ -59,6 +60,13 @@ function AppContent() {
       }
       localStorage.setItem('users', JSON.stringify(savedUsers));
       setUser({ userId, ...savedUsers[userId] });
+
+      // Загружаем список всех пользователей
+      const usersList = Object.entries(savedUsers).map(([id, userData]) => ({
+        userId: id,
+        username: userData.username,
+      }));
+      setAllUsers(usersList);
     } catch (error) {
       console.error("Error initializing Telegram Web App or user:", error);
     }
@@ -74,6 +82,13 @@ function AppContent() {
         subscribedChannels: user.subscribedChannels,
       };
       localStorage.setItem('users', JSON.stringify(savedUsers));
+
+      // Обновляем список всех пользователей
+      const usersList = Object.entries(savedUsers).map(([id, userData]) => ({
+        userId: id,
+        username: userData.username,
+      }));
+      setAllUsers(usersList);
     }
   }, [user]);
 
@@ -116,7 +131,6 @@ function AppContent() {
 
     loadChannels();
 
-    // Наблюдаем за изменениями в localStorage
     const handleStorageChange = (event) => {
       if (event.key === 'channels') {
         console.log("Storage event: Channels updated in localStorage");
@@ -473,6 +487,7 @@ function AppContent() {
               channel={showChannelSettings}
               onSave={handleUpdateChannel}
               onCancel={() => setShowChannelSettings(null)}
+              allUsers={allUsers} // Передаём список всех пользователей
             />
           </motion.div>
         )}

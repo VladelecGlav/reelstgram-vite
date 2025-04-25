@@ -11,7 +11,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api/upload': {
-        target: 'http://localhost:3000', // Убедись, что порт совпадает с server.js
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
         logLevel: 'debug',

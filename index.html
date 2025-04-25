@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <title>Reelstgram</title>
-    <!-- Подключаем Telegram Web App SDK (внешний URL, чтобы избежать 404) -->
+    <!-- Подключаем Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Подключаем manifest.json для PWA -->
     <link rel="manifest" href="/manifest.json" />
@@ -14,7 +14,13 @@
     <link rel="apple-touch-icon" href="/icon-192x192.png" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback-контент на случай ошибки -->
+      <div style="color: white; text-align: center; padding: 20px;">
+        <h1>Reelstgram</h1>
+        <p>Loading... If this takes too long, please refresh the page or check the console for errors.</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reelstgram-vite-cache-v2'; // Обновим имя кэша, чтобы очистить старый
+const CACHE_NAME = 'reelstgram-vite-cache-v3'; // Обновляем имя кэша
 
 const urlsToCache = [
   '/',
@@ -25,11 +25,20 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((response) => {
       // Если ресурс есть в кэше, возвращаем его
       if (response) {
-        return response;
+        // Проверяем, не устарел ли ресурс, делая запрос к сети
+        return fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+            return networkResponse;
+          }
+          return response;
+        }).catch(() => response); // Если сети нет, возвращаем кэшированный ресурс
       }
-      // Иначе делаем запрос к сети
+      // Если ресурса нет в кэше, делаем запрос к сети
       return fetch(event.request).then((networkResponse) => {
-        // Кэшируем новый ресурс
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {

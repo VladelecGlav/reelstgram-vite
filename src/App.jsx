@@ -79,38 +79,56 @@ function AppContent() {
 
   useEffect(() => {
     console.log("Step 5: Loading channels from localStorage...");
-    const saved = localStorage.getItem("channels");
-    if (saved) {
-      const parsedChannels = JSON.parse(saved);
-      const updatedChannels = parsedChannels.map((channel) => ({
-        ...channel,
-        avatar: channel.avatar || '',
-        uniqueId: channel.uniqueId || nanoid(8),
-        subscribed: channel.subscribed ?? false,
-        subscribers: channel.subscribers ?? Math.floor(Math.random() * 4900) + 100,
-        ownerId: channel.ownerId || 'default-user',
-        admins: channel.admins || [channel.ownerId || 'default-user'], // Добавляем поле admins
-        posts: channel.posts.map((post) => {
-          const updatedPost = {
-            ...post,
-            likes: post.likes || 0,
-            views: post.views || 0,
-            buttons: post.buttons || [
-              { text: "Visit Website", url: "https://example.com" },
-              { text: "Join Chat", url: "https://t.me/examplechat" },
-            ],
-          };
-          console.log("Post buttons after update:", updatedPost.buttons);
-          return updatedPost;
-        }),
-      }));
-      console.log("Step 6: Channels loaded:", updatedChannels);
-      setChannels(updatedChannels);
-      localStorage.setItem("channels", JSON.stringify(updatedChannels));
-    } else {
-      console.log("Step 6: No channels found in localStorage.");
-    }
-    setIsLoading(false);
+    const loadChannels = () => {
+      const saved = localStorage.getItem("channels");
+      if (saved) {
+        const parsedChannels = JSON.parse(saved);
+        const updatedChannels = parsedChannels.map((channel) => ({
+          ...channel,
+          avatar: channel.avatar || '',
+          uniqueId: channel.uniqueId || nanoid(8),
+          subscribed: channel.subscribed ?? false,
+          subscribers: channel.subscribers ?? Math.floor(Math.random() * 4900) + 100,
+          ownerId: channel.ownerId || 'default-user',
+          admins: channel.admins || [channel.ownerId || 'default-user'],
+          posts: channel.posts.map((post) => {
+            const updatedPost = {
+              ...post,
+              likes: post.likes || 0,
+              views: post.views || 0,
+              buttons: post.buttons || [
+                { text: "Visit Website", url: "https://example.com" },
+                { text: "Join Chat", url: "https://t.me/examplechat" },
+              ],
+            };
+            console.log("Post buttons after update:", updatedPost.buttons);
+            return updatedPost;
+          }),
+        }));
+        console.log("Step 6: Channels loaded:", updatedChannels);
+        setChannels(updatedChannels);
+        localStorage.setItem("channels", JSON.stringify(updatedChannels));
+      } else {
+        console.log("Step 6: No channels found in localStorage.");
+      }
+      setIsLoading(false);
+    };
+
+    loadChannels();
+
+    // Наблюдаем за изменениями в localStorage
+    const handleStorageChange = (event) => {
+      if (event.key === 'channels') {
+        console.log("Storage event: Channels updated in localStorage");
+        loadChannels();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -129,7 +147,7 @@ function AppContent() {
       subscribed: true,
       subscribers: Math.floor(Math.random() * 4900) + 100,
       ownerId: user.userId,
-      admins: [user.userId], // Изначально только владелец является админом
+      admins: [user.userId],
       posts: [],
     };
     setChannels([...channels, newChannel]);

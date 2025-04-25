@@ -21,6 +21,20 @@
         <p>Loading... If this takes too long, please refresh the page or check the console for errors.</p>
       </div>
     </div>
+    <script>
+      console.log("Index.html: Checking resource availability...");
+      // Проверяем доступность ресурсов
+      fetch('/manifest.json')
+        .then(res => console.log('/manifest.json loaded:', res.status))
+        .catch(err => console.error('Error loading /manifest.json:', err));
+      fetch('/icon-192x192.png')
+        .then(res => console.log('/icon-192x192.png loaded:', res.status))
+        .catch(err => console.error('Error loading /icon-192x192.png:', err));
+      fetch('/sw.js')
+        .then(res => console.log('/sw.js loaded:', res.status))
+        .catch(err => console.error('Error loading /sw.js:', err));
+      console.log("Index.html: Attempting to load main.jsx...");
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

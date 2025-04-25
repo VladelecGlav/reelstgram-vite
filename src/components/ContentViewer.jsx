@@ -75,17 +75,14 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
           navigate(`/channel/${newChannel.uniqueId}/post/0`);
         }
       }
-      // Проверяем, подписан ли пользователь, и показываем уведомление, если не подписан
       setShowSubscribePrompt(!user.subscribedChannels.includes(newChannel.uniqueId));
 
-      // Логируем событие перехода по ссылке
       logAnalyticsEvent('link_click', {
         channelId: uniqueId,
         channelName: newChannel.name,
         timestamp: new Date().toISOString(),
       });
 
-      // Отправляем событие в GA4 (если подключён)
       sendGA4Event('link_click', {
         channel_id: uniqueId,
         channel_name: newChannel.name,
@@ -180,21 +177,18 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
     handleToggleSubscription(uniqueId);
     setShowSubscribePrompt(false);
 
-    // Логируем событие подписки
     logAnalyticsEvent('subscribe', {
       channelId: uniqueId,
       channelName: channel.name,
       timestamp: new Date().toISOString(),
     });
 
-    // Отправляем событие в GA4 (если подключён)
     sendGA4Event('subscribe', {
       channel_id: uniqueId,
       channel_name: channel.name,
     });
   };
 
-  // Если канал не найден, показываем сообщение об ошибке
   if (!channel) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-black">
@@ -211,7 +205,6 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
     );
   }
 
-  // Если пост не найден или канал пуст
   if (parseInt(postId) === 0 && channel.posts.length === 0) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-black">
@@ -322,15 +315,19 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
             Back
           </button>
           <p className="text-white text-lg">No posts yet. Add some content!</p>
-          <button
-            onClick={() => onAddContent(channel)}
-            className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50"
-          >
-            Add Content
-          </button>
+          {channel.ownerId === user.userId && (
+            <motion.button
+              onClick={() => onAddContent(channel)}
+              className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50 shadow-lg"
+              whileHover={{ scale: 1.1, boxShadow: "0px 0px 15px rgba(34, 197, 94, 0.5)" }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              Add Content
+            </motion.button>
+          )}
         </div>
 
-        {/* Уведомление "Подписаться" */}
         <AnimatePresence>
           {showSubscribePrompt && (
             <motion.div
@@ -357,7 +354,6 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
     );
   }
 
-  // Если пост не найден
   if (!channel.posts[currentIndex]) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-black">
@@ -455,7 +451,6 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
           <p className="text-white text-lg">Post not found.</p>
         </div>
 
-        {/* Уведомление "Подписаться" */}
         <AnimatePresence>
           {showSubscribePrompt && (
             <motion.div
@@ -628,15 +623,19 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
             />
           </motion.div>
         </AnimatePresence>
-        <button
-          onClick={() => onAddContent(channel)}
-          className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50"
-        >
-          Add Content
-        </button>
+        {channel.ownerId === user.userId && (
+          <motion.button
+            onClick={() => onAddContent(channel)}
+            className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded z-50 shadow-lg"
+            whileHover={{ scale: 1.1, boxShadow: "0px 0px 15px rgba(34, 197, 94, 0.5)" }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            Add Content
+          </motion.button>
+        )}
       </div>
 
-      {/* Уведомление "Подписаться" */}
       <AnimatePresence>
         {showSubscribePrompt && (
           <motion.div

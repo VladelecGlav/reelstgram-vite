@@ -7,7 +7,7 @@ import CreateChannel from './components/CreateChannel';
 import AddContent from './components/AddContent';
 import ContentViewer from './components/ContentViewer';
 import ChannelSettings from './components/ChannelSettings';
-import UserProfile from './components/UserProfile'; // Новый компонент
+import UserProfile from './components/UserProfile';
 
 function AppContent() {
   console.log("Step 4: App component initialized.");
@@ -18,7 +18,7 @@ function AppContent() {
   const [showAddContent, setShowAddContent] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showChannelSettings, setShowChannelSettings] = useState(null);
-  const [user, setUser] = useState(null); // Состояние для пользователя
+  const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
 
@@ -39,14 +39,12 @@ function AppContent() {
         navigate(`/channel/${channelId}/post/0`);
       }
     } else {
-      // Локальная авторизация для тестирования
       userId = localStorage.getItem('userId') || 'default-user';
       username = localStorage.getItem('username') || 'Anonymous';
       localStorage.setItem('userId', userId);
       localStorage.setItem('username', username);
     }
 
-    // Загружаем профиль пользователя из localStorage
     const savedUsers = JSON.parse(localStorage.getItem('users')) || {};
     if (!savedUsers[userId]) {
       savedUsers[userId] = {
@@ -59,7 +57,6 @@ function AppContent() {
     setUser({ userId, ...savedUsers[userId] });
   }, [navigate]);
 
-  // Сохранение профиля пользователя при изменении
   useEffect(() => {
     if (user) {
       const savedUsers = JSON.parse(localStorage.getItem('users')) || {};
@@ -83,6 +80,7 @@ function AppContent() {
         uniqueId: channel.uniqueId || nanoid(8),
         subscribed: channel.subscribed ?? false,
         subscribers: channel.subscribers ?? Math.floor(Math.random() * 4900) + 100,
+        ownerId: channel.ownerId || 'default-user', // Добавляем ownerId, если его нет
         posts: channel.posts.map((post) => {
           const updatedPost = {
             ...post,
@@ -121,13 +119,13 @@ function AppContent() {
       avatar: '',
       subscribed: true,
       subscribers: Math.floor(Math.random() * 4900) + 100,
+      ownerId: user.userId, // Устанавливаем текущего пользователя как владельца
       posts: [],
     };
     setChannels([...channels, newChannel]);
     setShowCreateChannel(false);
     setIsMenuOpen(false);
 
-    // Добавляем канал в подписки пользователя
     setUser((prevUser) => ({
       ...prevUser,
       subscribedChannels: [...prevUser.subscribedChannels, newChannel.uniqueId],
@@ -217,7 +215,6 @@ function AppContent() {
     );
     setChannels(updatedChannels);
 
-    // Обновляем подписки пользователя
     setUser((prevUser) => {
       const subscribedChannels = prevUser.subscribedChannels.includes(channelUniqueId)
         ? prevUser.subscribedChannels.filter((id) => id !== channelUniqueId)

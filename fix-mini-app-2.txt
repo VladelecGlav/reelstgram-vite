@@ -1,0 +1,1 @@
+"Fix Telegram Mini App issue 2" 

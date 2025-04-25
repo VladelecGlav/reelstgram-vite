@@ -1,0 +1,57 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "phoneNumber": "+79874764748",
+      "subscriptions": []
+    },
+    {
+      "id": 2,
+      "phoneNumber": "89874764748",
+      "subscriptions": []
+    },
+    {
+      "id": 3,
+      "phoneNumber": "+123456789",
+      "subscriptions": []
+    },
+    {
+      "id": 4,
+      "phoneNumber": "3455434543",
+      "subscriptions": []
+    },
+    {
+      "id": 5,
+      "phoneNumber": "123456678",
+      "subscriptions": []
+    },
+    {
+      "id": 6,
+      "phoneNumber": "809483493",
+      "subscriptions": []
+    }
+  ],
+  "channels": [
+    {
+      "id": 1,
+      "uniqueId": "20KPa4CE",
+      "name": "ааа",
+      "description": "",
+      "avatar": "",
+      "subscribed": true,
+      "subscribers": 2605,
+      "posts": [
+        {
+          "id": 1,
+          "type": "video",
+          "url": "http://localhost:3000/uploads/1745574931062-143490772.mp4",
+          "caption": "",
+          "likes": 0,
+          "views": 1015,
+          "comments": []
+        }
+      ],
+      "creatorId": 1
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import { useState } from 'react';
 export default function AddContent({ channel, onSave, onCancel }) {
   const [file, setFile] = useState(null);
   const [caption, setCaption] = useState('');
-  const [buttons, setButtons] = useState([]); // Состояние для URL-кнопок
+  const [buttons, setButtons] = useState([]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -21,7 +21,7 @@ export default function AddContent({ channel, onSave, onCancel }) {
     formData.append('channelId', channel.id);
 
     try {
-      const response = await fetch('http://localhost:3000/upload', {
+      const response = await fetch('/api/upload', { // Используем Vercel Serverless Function
         method: 'POST',
         body: formData,
       });
@@ -33,12 +33,11 @@ export default function AddContent({ channel, onSave, onCancel }) {
       const data = await response.json();
       console.log('AddContent.jsx: File uploaded successfully:', data);
 
-      // Добавляем новый контент с caption и buttons
       onSave({
         type: file.type.startsWith('video') ? 'video' : 'image',
         url: data.url,
         caption,
-        buttons, // Передаём массив кнопок
+        buttons,
       });
     } catch (error) {
       console.error('AddContent.jsx: Error uploading file:', error);

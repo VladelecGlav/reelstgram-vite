@@ -210,7 +210,7 @@ export default function Post({ post, channelId, onLike }) {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const relativeUrl = post.url.replace('http://localhost:3000', '');
+  const relativeUrl = post.url; // Убираем замену localhost, так как URL уже относительный
   console.log('Post.jsx: Attempting to load media from:', relativeUrl);
   console.log('Post.jsx: Post buttons:', post.buttons);
 

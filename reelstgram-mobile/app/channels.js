@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   },
   createChannelButton: {
     position: 'absolute',
-    top: 60,
+    bottom: 80, // Перемещаем кнопку выше панели навигации
     right: 20,
     backgroundColor: '#2ecc71',
     width: 40,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 10,
+    zIndex: 1000, // Устанавливаем высокий zIndex, чтобы кнопка была поверх панели
   },
   createChannelButtonText: {
     color: '#fff',

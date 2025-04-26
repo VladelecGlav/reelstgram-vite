@@ -1,0 +1,141 @@
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export default function MenuScreen() {
+  const router = useRouter();
+  const [channels, setChannels] = useState([]);
+
+  useEffect(() => {
+    const loadChannels = async () => {
+      let savedChannels = await AsyncStorage.getItem('channels');
+      if (savedChannels) {
+        setChannels(JSON.parse(savedChannels));
+      }
+    };
+    loadChannels();
+  }, []);
+
+  const handleSelectChannel = (channel) => {
+    router.push(`/channel/${channel.uniqueId}`);
+  };
+
+  const renderChannel = ({ item }) => (
+    <TouchableOpacity
+      style={styles.channelCard}
+      onPress={() => handleSelectChannel(item)}
+    >
+      <View style={styles.channelContent}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{item.name[0]}</Text>
+        </View>
+        <View>
+          <Text style={styles.channelName}>{item.name}</Text>
+          <Text style={styles.subscribers}>{item.subscribers.toLocaleString()} subscribers</Text>
+        </View>
+      </View>
+      <Text style={styles.description} numberOfLines={1}>{item.description}</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Menu</Text>
+      <Text style={styles.sectionTitle}>All Channels</Text>
+      {channels.length === 0 ? (
+        <Text style={styles.noChannels}>No channels yet. Create one!</Text>
+      ) : (
+        <FlatList
+          data={channels}
+          renderItem={renderChannel}
+          keyExtractor={(item) => item.uniqueId}
+          contentContainerStyle={styles.channelList}
+        />
+      )}
+      <TouchableOpacity
+        onPress={() => router.push('/')}
+        style={styles.backButton}
+      >
+        <Text style={styles.backButtonText}>Back to Home</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 10,
+  },
+  noChannels: {
+    color: '#aaa',
+    textAlign: 'center',
+  },
+  channelList: {
+    paddingBottom: 20,
+  },
+  channelCard: {
+    backgroundColor: '#1a1a1a',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  channelContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  avatarText: {
+    color: '#fff',
+    fontSize: 20,
+  },
+  channelName: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  subscribers: {
+    color: '#aaa',
+    fontSize: 14,
+  },
+  description: {
+    color: '#ccc',
+    fontSize: 14,
+  },
+  backButton: {
+    backgroundColor: '#1e90ff',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});

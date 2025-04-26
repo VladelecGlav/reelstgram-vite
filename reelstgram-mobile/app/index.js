@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -76,8 +76,7 @@ export default function WelcomeScreen() {
   };
 
   const handleOpenMenu = () => {
-    // Здесь можно добавить экран меню
-    Alert.alert('Menu', 'This feature is under development.');
+    router.push('/menu');
   };
 
   const handleCreateChannel = () => {

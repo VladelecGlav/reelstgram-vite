@@ -20,6 +20,9 @@ export default function RootLayout() {
     router.push('/channels');
   };
 
+  // Определяем, активна ли вкладка "Каналы"
+  const isChannelsActive = pathname === '/channels' || pathname === '/';
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -63,17 +66,17 @@ export default function RootLayout() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleChannels}
-            style={[styles.navButton, pathname === '/channels' && styles.activeNavButton]}
+            style={[styles.navButton, isChannelsActive && styles.activeNavButton]}
           >
             <Ionicons
               name="chatbubbles-outline"
               size={24}
-              color={pathname === '/channels' ? '#1e90ff' : '#fff'}
+              color={isChannelsActive ? '#1e90ff' : '#fff'}
             />
             <Text
               style={[
                 styles.navText,
-                pathname === '/channels' && styles.activeNavText,
+                isChannelsActive && styles.activeNavText,
               ]}
             >
               Каналы

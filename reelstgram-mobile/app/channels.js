@@ -6,23 +6,76 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function ChannelsScreen() {
   const router = useRouter();
   const [channels, setChannels] = useState([]);
+  const [currentUser] = useState('default-user'); // Для примера
 
   useEffect(() => {
     const loadChannels = async () => {
       let savedChannels = await AsyncStorage.getItem('channels');
-      if (savedChannels) {
-        setChannels(JSON.parse(savedChannels));
+      if (!savedChannels) {
+        savedChannels = [
+          {
+            id: 1,
+            uniqueId: 'channel1',
+            name: 'Канал 1',
+            description: 'Добро пожаловать в Канал 1!',
+            avatar: '',
+            subscribed: true,
+            subscribers: 150,
+            ownerId: 'default-user',
+            admins: ['default-user'],
+            posts: [
+              {
+                id: 1,
+                url: 'https://example.com/image1.jpg',
+                type: 'image',
+                caption: 'Первый пост в Канале 1',
+                likes: 5,
+                views: 10,
+                buttons: [],
+                comments: [],
+              },
+            ],
+          },
+          {
+            id: 2,
+            uniqueId: 'channel2',
+            name: 'Канал 2',
+            description: 'Добро пожаловать в Канал 2!',
+            avatar: '',
+            subscribed: true,
+            subscribers: 200,
+            ownerId: 'user1',
+            admins: ['user1'],
+            posts: [
+              {
+                id: 1,
+                url: 'https://example.com/image2.jpg',
+                type: 'image',
+                caption: 'Первый пост в Канале 2',
+                likes: 3,
+                views: 8,
+                buttons: [],
+                comments: [],
+              },
+            ],
+          },
+        ];
+        await AsyncStorage.setItem('channels', JSON.stringify(savedChannels));
       }
+      setChannels(JSON.parse(savedChannels));
     };
     loadChannels();
   }, []);
+
+  // Фильтруем только подписанные каналы для текущего пользователя
+  const subscribedChannels = channels.filter((channel) => channel.subscribed);
 
   const handleSelectChannel = (channel) => {
     router.push(`/channel/${channel.uniqueId}`);
   };
 
-  const handleBackToHome = () => {
-    router.push('/');
+  const handleCreateChannel = () => {
+    router.push('/create-channel');
   };
 
   const renderChannel = ({ item }) => (
@@ -45,23 +98,22 @@ export default function ChannelsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Каналы</Text>
-      {channels.length === 0 ? (
+      <TouchableOpacity
+        onPress={handleCreateChannel}
+        style={styles.createChannelButton}
+      >
+        <Text style={styles.createChannelButtonText}>+</Text>
+      </TouchableOpacity>
+      {subscribedChannels.length === 0 ? (
         <Text style={styles.noChannels}>Пока нет каналов. Создайте один!</Text>
       ) : (
         <FlatList
-          data={channels}
+          data={subscribedChannels}
           renderItem={renderChannel}
           keyExtractor={(item) => item.uniqueId}
           contentContainerStyle={styles.channelList}
         />
       )}
-      <TouchableOpacity
-        onPress={handleBackToHome}
-        style={styles.backButton}
-      >
-        <Text style={styles.backButtonText}>Вернуться на главную</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -73,12 +125,22 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
+  createChannelButton: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    backgroundColor: '#2ecc71',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  createChannelButtonText: {
     color: '#fff',
-    textAlign: 'center',
-    marginBottom: 10,
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   noChannels: {
     color: '#aaa',
@@ -87,7 +149,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   channelList: {
-    paddingBottom: 80, // Уменьшаем отступ, так как панель стала компактнее
+    paddingBottom: 80, // Оставляем место для нижней навигации
   },
   channelCard: {
     backgroundColor: '#1a1a1a',
@@ -125,17 +187,5 @@ const styles = StyleSheet.create({
   description: {
     color: '#ccc',
     fontSize: 14,
-  },
-  backButton: {
-    backgroundColor: '#1e90ff',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginVertical: 20,
-    marginBottom: 80, // Устанавливаем отступ, чтобы кнопка была выше панели навигации
-  },
-  backButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });

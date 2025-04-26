@@ -17,7 +17,6 @@ export default function ChannelsScreen() {
             id: 1,
             uniqueId: 'channel1',
             name: 'Канал 1',
-            description: 'Добро пожаловать в Канал 1!',
             avatar: '',
             subscribed: true,
             subscribers: 150,
@@ -40,7 +39,6 @@ export default function ChannelsScreen() {
             id: 2,
             uniqueId: 'channel2',
             name: 'Канал 2',
-            description: 'Добро пожаловать в Канал 2!',
             avatar: '',
             subscribed: true,
             subscribers: 200,
@@ -92,7 +90,6 @@ export default function ChannelsScreen() {
           <Text style={styles.subscribers}>{item.subscribers.toLocaleString()} подписчиков</Text>
         </View>
       </View>
-      <Text style={styles.description} numberOfLines={1}>{item.description}</Text>
     </TouchableOpacity>
   );
 
@@ -160,7 +157,6 @@ const styles = StyleSheet.create({
   channelContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
   },
   avatar: {
     width: 40,
@@ -182,10 +178,6 @@ const styles = StyleSheet.create({
   },
   subscribers: {
     color: '#aaa',
-    fontSize: 14,
-  },
-  description: {
-    color: '#ccc',
     fontSize: 14,
   },
 });

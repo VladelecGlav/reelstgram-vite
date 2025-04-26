@@ -6,12 +6,6 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
-// Утилита для преобразования текста с URL в кликабельные ссылки (упрощённая версия для React Native)
-const renderTextWithLinks = (text) => {
-  if (!text) return 'Описание отсутствует.';
-  return text; // Для React Native мы не будем делать кликабельные ссылки, так как это требует дополнительных компонентов
-};
-
 export default function ContentViewerScreen() {
   const { id } = useLocalSearchParams(); // Получаем параметр id из URL
   const router = useRouter();
@@ -197,7 +191,6 @@ export default function ContentViewerScreen() {
                 </View>
                 <Text style={styles.modalTitle}>{channel.name}</Text>
               </View>
-              <Text style={styles.modalDescription}>{renderTextWithLinks(channel.description)}</Text>
               <Text style={styles.modalSubscribers}>{channel.subscribers.toLocaleString()} подписчиков</Text>
               <TouchableOpacity onPress={copyChannelLink} style={styles.modalButton}>
                 <Text style={styles.modalButtonText}>Скопировать ссылку на канал</Text>
@@ -318,7 +311,6 @@ export default function ContentViewerScreen() {
               </View>
               <Text style={styles.modalTitle}>{channel.name}</Text>
             </View>
-            <Text style={styles.modalDescription}>{renderTextWithLinks(channel.description)}</Text>
             <Text style={styles.modalSubscribers}>{channel.subscribers.toLocaleString()} подписчиков</Text>
             <TouchableOpacity onPress={copyChannelLink} style={styles.modalButton}>
               <Text style={styles.modalButtonText}>Скопировать ссылку на канал</Text>
@@ -441,11 +433,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  modalDescription: {
-    fontSize: 14,
-    color: '#ccc',
-    marginBottom: 15,
   },
   modalSubscribers: {
     fontSize: 14,

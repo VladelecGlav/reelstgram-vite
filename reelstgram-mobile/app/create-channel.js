@@ -7,12 +7,11 @@ import { nanoid } from 'nanoid/non-secure';
 export default function CreateChannelScreen() {
   const router = useRouter();
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
   const [currentUser] = useState('default-user'); // Для примера, можно заменить на реального пользователя
 
   const handleCreateChannel = async () => {
-    if (!name || !description) {
-      Alert.alert('Ошибка', 'Пожалуйста, заполните название и описание.');
+    if (!name) {
+      Alert.alert('Ошибка', 'Пожалуйста, введите название канала.');
       return;
     }
 
@@ -20,7 +19,6 @@ export default function CreateChannelScreen() {
       id: Date.now(),
       uniqueId: nanoid(),
       name,
-      description,
       avatar: '',
       subscribed: true,
       subscribers: 1,
@@ -50,14 +48,6 @@ export default function CreateChannelScreen() {
         placeholder="Название канала"
         placeholderTextColor="#aaa"
         style={styles.input}
-      />
-      <TextInput
-        value={description}
-        onChangeText={setDescription}
-        placeholder="Описание"
-        placeholderTextColor="#aaa"
-        style={styles.input}
-        multiline
       />
       <TouchableOpacity onPress={handleCreateChannel} style={styles.createButton}>
         <Text style={styles.createButtonText}>Создать канал</Text>

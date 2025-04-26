@@ -75,6 +75,15 @@ export default function WelcomeScreen() {
     router.push(`/channel/${channel.uniqueId}`);
   };
 
+  const handleOpenMenu = () => {
+    // Здесь можно добавить экран меню
+    Alert.alert('Menu', 'This feature is under development.');
+  };
+
+  const handleCreateChannel = () => {
+    router.push('/create-channel');
+  };
+
   const renderChannel = ({ item }) => (
     <TouchableOpacity
       style={styles.channelCard}
@@ -95,6 +104,18 @@ export default function WelcomeScreen() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        onPress={handleOpenMenu}
+        style={styles.menuButton}
+      >
+        <Text style={styles.menuButtonText}>☰</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={handleCreateChannel}
+        style={styles.createChannelButton}
+      >
+        <Text style={styles.createChannelButtonText}>+</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Welcome to Reelstgram!</Text>
       <Text style={styles.subtitle}>Discover and share amazing content in our channels.</Text>
       <Text style={styles.sectionTitle}>Popular Channels</Text>
@@ -118,6 +139,34 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingTop: 50,
     paddingHorizontal: 20,
+  },
+  menuButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    backgroundColor: '#1e90ff',
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 10,
+  },
+  menuButtonText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  createChannelButton: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    backgroundColor: '#2ecc71',
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 10,
+  },
+  createChannelButtonText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 36,

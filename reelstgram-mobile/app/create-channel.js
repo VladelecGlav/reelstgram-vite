@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { nanoid } from 'nanoid/non-secure';
+import analytics from '@react-native-firebase/analytics';
 
 export default function CreateChannelScreen() {
   const router = useRouter();
@@ -10,8 +11,21 @@ export default function CreateChannelScreen() {
   const [description, setDescription] = useState('');
   const [currentUser] = useState('default-user'); // Для примера, можно заменить на реального пользователя
 
+  useEffect(() => {
+    const logScreenView = async () => {
+      await analytics().logScreenView({
+        screen_name: 'CreateChannel',
+        screen_class: 'CreateChannelScreen',
+      });
+    };
+    logScreenView();
+  }, []);
+
   const handleCreateChannel = async () => {
     if (!name || !description) {
+      await analytics().logEvent('create_channel_failed', {
+        reason: 'missing_fields',
+      });
       Alert.alert('Error', 'Please fill in both name and description.');
       return;
     }
@@ -33,7 +47,18 @@ export default function CreateChannelScreen() {
     const updatedChannels = [...channels, newChannel];
     await AsyncStorage.setItem('channels', JSON.stringify(updatedChannels));
 
+    await analytics().logEvent('create_channel_success', {
+      channel_id: newChannel.uniqueId,
+      channel_name: newChannel.name,
+      user_id: currentUser,
+    });
+
     Alert.alert('Success', 'Channel created successfully!');
+    router.back();
+  };
+
+  const handleCancel = async () => {
+    await analytics().logEvent('create_channel_cancel', {});
     router.back();
   };
 
@@ -58,7 +83,7 @@ export default function CreateChannelScreen() {
       <TouchableOpacity onPress={handleCreateChannel} style={styles.createButton}>
         <Text style={styles.createButtonText}>Create Channel</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.back()} style={styles.cancelButton}>
+      <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
         <Text style={styles.cancelButtonText}>Cancel</Text>
       </TouchableOpacity>
     </View>

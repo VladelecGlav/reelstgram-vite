@@ -2,12 +2,21 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import analytics from '@react-native-firebase/analytics';
 
 export default function MenuScreen() {
   const router = useRouter();
   const [channels, setChannels] = useState([]);
 
   useEffect(() => {
+    const logScreenView = async () => {
+      await analytics().logScreenView({
+        screen_name: 'Menu',
+        screen_class: 'MenuScreen',
+      });
+    };
+    logScreenView();
+
     const loadChannels = async () => {
       let savedChannels = await AsyncStorage.getItem('channels');
       if (savedChannels) {
@@ -17,8 +26,17 @@ export default function MenuScreen() {
     loadChannels();
   }, []);
 
-  const handleSelectChannel = (channel) => {
+  const handleSelectChannel = async (channel) => {
+    await analytics().logEvent('select_channel_from_menu', {
+      channel_id: channel.uniqueId,
+      channel_name: channel.name,
+    });
     router.push(`/channel/${channel.uniqueId}`);
+  };
+
+  const handleBackToHome = async () => {
+    await analytics().logEvent('back_to_home_from_menu', {});
+    router.push('/');
   };
 
   const renderChannel = ({ item }) => (
@@ -54,7 +72,7 @@ export default function MenuScreen() {
         />
       )}
       <TouchableOpacity
-        onPress={() => router.push('/')}
+        onPress={handleBackToHome}
         style={styles.backButton}
       >
         <Text style={styles.backButtonText}>Back to Home</Text>

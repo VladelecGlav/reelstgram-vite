@@ -2,16 +2,24 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, Alert } from 'react
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import analytics from '@react-native-firebase/analytics';
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const [channels, setChannels] = useState([]);
 
   useEffect(() => {
+    const logScreenView = async () => {
+      await analytics().logScreenView({
+        screen_name: 'Welcome',
+        screen_class: 'WelcomeScreen',
+      });
+    };
+    logScreenView();
+
     const loadChannels = async () => {
       let savedChannels = await AsyncStorage.getItem('channels');
       if (!savedChannels) {
-        // Добавляем тестовые данные, если каналы ещё не существуют
         savedChannels = [
           {
             id: 1,
@@ -71,15 +79,21 @@ export default function WelcomeScreen() {
     .sort((a, b) => b.subscribers - a.subscribers)
     .slice(0, 5);
 
-  const handleSelectChannel = (channel) => {
+  const handleSelectChannel = async (channel) => {
+    await analytics().logEvent('select_channel', {
+      channel_id: channel.uniqueId,
+      channel_name: channel.name,
+    });
     router.push(`/channel/${channel.uniqueId}`);
   };
 
-  const handleOpenMenu = () => {
+  const handleOpenMenu = async () => {
+    await analytics().logEvent('open_menu', {});
     router.push('/menu');
   };
 
-  const handleCreateChannel = () => {
+  const handleCreateChannel = async () => {
+    await analytics().logEvent('create_channel_start', {});
     router.push('/create-channel');
   };
 

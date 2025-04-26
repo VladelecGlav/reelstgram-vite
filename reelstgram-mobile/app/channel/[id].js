@@ -5,25 +5,12 @@ import { Video } from 'expo-av';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import analytics from '@react-native-firebase/analytics';
 
 // Утилита для преобразования текста с URL в кликабельные ссылки (упрощённая версия для React Native)
 const renderTextWithLinks = (text) => {
   if (!text) return 'No description available.';
   return text; // Для React Native мы не будем делать кликабельные ссылки, так как это требует дополнительных компонентов
-};
-
-// Функция для записи аналитики в AsyncStorage
-const logAnalyticsEvent = async (eventType, data) => {
-  const timestamp = new Date().toISOString();
-  const analyticsData = JSON.parse(await AsyncStorage.getItem('analytics')) || [];
-  analyticsData.push({ eventType, data, timestamp });
-  await AsyncStorage.setItem('analytics', JSON.stringify(analyticsData));
-  console.log(`Analytics event logged: ${eventType}`, data);
-};
-
-// Функция для отправки события в Google Analytics (если GA4 подключён через Firebase Analytics)
-const sendGA4Event = async (eventName, params) => {
-  console.log('GA4 event sent (placeholder):', eventName, params);
 };
 
 export default function ContentViewerScreen() {
@@ -47,6 +34,14 @@ export default function ContentViewerScreen() {
   }));
 
   useEffect(() => {
+    const logScreenView = async () => {
+      await analytics().logScreenView({
+        screen_name: 'ChannelView',
+        screen_class: 'ContentViewerScreen',
+      });
+    };
+    logScreenView();
+
     const loadChannel = async () => {
       const channels = JSON.parse(await AsyncStorage.getItem('channels')) || [];
       const selectedChannel = channels.find((ch) => ch.uniqueId === id);
@@ -54,14 +49,7 @@ export default function ContentViewerScreen() {
         setChannel(selectedChannel);
         setPosts(selectedChannel.posts || []);
 
-        logAnalyticsEvent('channel_view', {
-          channelId: selectedChannel.uniqueId,
-          channelName: selectedChannel.name,
-          userId: currentUser,
-          timestamp: new Date().toISOString(),
-        });
-
-        sendGA4Event('channel_view', {
+        await analytics().logEvent('channel_view', {
           channel_id: selectedChannel.uniqueId,
           channel_name: selectedChannel.name,
           user_id: currentUser,
@@ -71,13 +59,7 @@ export default function ContentViewerScreen() {
           const viewKey = `${selectedChannel.uniqueId}-${selectedChannel.posts[currentIndex].id}`;
           if (!hasViewed[viewKey]) {
             setHasViewed((prev) => ({ ...prev, [viewKey]: true }));
-            logAnalyticsEvent('post_view', {
-              postId: selectedChannel.posts[currentIndex].id,
-              channelId: selectedChannel.uniqueId,
-              userId: currentUser,
-              timestamp: new Date().toISOString(),
-            });
-            sendGA4Event('post_view', {
+            await analytics().logEvent('post_view', {
               post_id: selectedChannel.posts[currentIndex].id,
               channel_id: selectedChannel.uniqueId,
               user_id: currentUser,
@@ -130,14 +112,7 @@ export default function ContentViewerScreen() {
     );
     await AsyncStorage.setItem('channels', JSON.stringify(updatedChannels));
 
-    logAnalyticsEvent('like_post', {
-      postId: postId,
-      channelId: channel.uniqueId,
-      userId: currentUser,
-      timestamp: new Date().toISOString(),
-    });
-
-    sendGA4Event('like_post', {
+    await analytics().logEvent('like_post', {
       post_id: postId,
       channel_id: channel.uniqueId,
       user_id: currentUser,
@@ -164,18 +139,11 @@ export default function ContentViewerScreen() {
     );
     await AsyncStorage.setItem('channels', JSON.stringify(updatedChannels));
 
-    logAnalyticsEvent('add_comment', {
-      postId: postId,
-      channelId: channel.uniqueId,
-      userId: currentUser,
-      commentText: newComment,
-      timestamp: new Date().toISOString(),
-    });
-
-    sendGA4Event('add_comment', {
+    await analytics().logEvent('add_comment', {
       post_id: postId,
       channel_id: channel.uniqueId,
       user_id: currentUser,
+      comment_text: newComment,
     });
 
     setNewComment('');
@@ -205,32 +173,18 @@ export default function ContentViewerScreen() {
     const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${channel.uniqueId}/post/0`;
     Alert.alert('Channel Link Copied', channelLink);
 
-    logAnalyticsEvent('copy_channel_link', {
-      channelId: channel.uniqueId,
-      channelName: channel.name,
-      userId: currentUser,
-      timestamp: new Date().toISOString(),
-    });
-
-    sendGA4Event('copy_channel_link', {
+    await analytics().logEvent('copy_channel_link', {
       channel_id: channel.uniqueId,
       channel_name: channel.name,
       user_id: currentUser,
     });
   };
 
-  const shareChannelLink = () => {
+  const shareChannelLink = async () => {
     const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${channel.uniqueId}/post/0`;
     Alert.alert('Share Channel', 'Share this link: ' + channelLink);
 
-    logAnalyticsEvent('share_channel', {
-      channelId: channel.uniqueId,
-      channelName: channel.name,
-      userId: currentUser,
-      timestamp: new Date().toISOString(),
-    });
-
-    sendGA4Event('share_channel', {
+    await analytics().logEvent('share_channel', {
       channel_id: channel.uniqueId,
       channel_name: channel.name,
       user_id: currentUser,
@@ -241,20 +195,17 @@ export default function ContentViewerScreen() {
     setIsChannelInfoOpen(!isChannelInfoOpen);
   };
 
-  const handleAddContentClick = () => {
+  const handleAddContentClick = async () => {
     if (isOwnerOrAdmin) {
+      await analytics().logEvent('add_content_start', {
+        channel_id: channel.uniqueId,
+        user_id: currentUser,
+      });
       router.push(`/add-content/${channel.uniqueId}`);
     } else {
       setShowPermissionPrompt(true);
 
-      logAnalyticsEvent('add_content_denied', {
-        channelId: channel.uniqueId,
-        channelName: channel.name,
-        userId: currentUser,
-        timestamp: new Date().toISOString(),
-      });
-
-      sendGA4Event('add_content_denied', {
+      await analytics().logEvent('add_content_denied', {
         channel_id: channel.uniqueId,
         channel_name: channel.name,
         user_id: currentUser,

@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import analytics from '@react-native-firebase/analytics';
 
 export default function AddContentScreen() {
   const { id } = useLocalSearchParams(); // Получаем параметр id из URL
@@ -11,6 +12,14 @@ export default function AddContentScreen() {
   const [newPostCaption, setNewPostCaption] = useState('');
 
   useEffect(() => {
+    const logScreenView = async () => {
+      await analytics().logScreenView({
+        screen_name: 'AddContent',
+        screen_class: 'AddContentScreen',
+      });
+    };
+    logScreenView();
+
     const loadChannel = async () => {
       const channels = JSON.parse(await AsyncStorage.getItem('channels')) || [];
       const selectedChannel = channels.find((ch) => ch.uniqueId === id);
@@ -23,6 +32,10 @@ export default function AddContentScreen() {
 
   const handleAddPost = async () => {
     if (!newPostUrl || !newPostCaption) {
+      await analytics().logEvent('add_post_failed', {
+        channel_id: id,
+        reason: 'missing_fields',
+      });
       Alert.alert('Error', 'Please fill in both URL and caption.');
       return;
     }
@@ -45,7 +58,19 @@ export default function AddContentScreen() {
     );
     await AsyncStorage.setItem('channels', JSON.stringify(updatedChannels));
 
+    await analytics().logEvent('add_post_success', {
+      channel_id: id,
+      post_id: newPost.id,
+    });
+
     Alert.alert('Success', 'Post added successfully!');
+    router.back();
+  };
+
+  const handleCancel = async () => {
+    await analytics().logEvent('add_post_cancel', {
+      channel_id: id,
+    });
     router.back();
   };
 
@@ -83,7 +108,7 @@ export default function AddContentScreen() {
       <TouchableOpacity onPress={handleAddPost} style={styles.addButton}>
         <Text style={styles.addButtonText}>Add Post</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.back()} style={styles.cancelButton}>
+      <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
         <Text style={styles.cancelButtonText}>Cancel</Text>
       </TouchableOpacity>
     </View>

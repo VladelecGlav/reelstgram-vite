@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     padding: 20,
     paddingTop: 50,
+    paddingBottom: 100, // Оставляем место для нижней навигации
   },
   title: {
     fontSize: 24,

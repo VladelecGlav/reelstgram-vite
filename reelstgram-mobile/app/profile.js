@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingTop: 50,
     paddingHorizontal: 20,
+    paddingBottom: 100, // Оставляем место для нижней навигации
   },
   title: {
     fontSize: 36,

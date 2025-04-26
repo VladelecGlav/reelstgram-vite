@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function SubscribedChannelsScreen() {
   const router = useRouter();
@@ -79,18 +78,6 @@ export default function SubscribedChannelsScreen() {
     router.push('/create-channel');
   };
 
-  const handleSettings = () => {
-    router.push('/settings');
-  };
-
-  const handleProfile = () => {
-    router.push('/profile');
-  };
-
-  const handleChannels = () => {
-    router.push('/channels');
-  };
-
   const renderChannel = ({ item }) => (
     <TouchableOpacity
       style={styles.channelCard}
@@ -127,20 +114,6 @@ export default function SubscribedChannelsScreen() {
           contentContainerStyle={styles.channelList}
         />
       )}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={handleSettings} style={styles.navButton}>
-          <Ionicons name="settings-outline" size={30} color="#fff" />
-          <Text style={styles.navText}>Настройки</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleProfile} style={styles.navButton}>
-          <Ionicons name="person-outline" size={30} color="#fff" />
-          <Text style={styles.navText}>Профиль</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleChannels} style={styles.navButton}>
-          <Ionicons name="chatbubbles-outline" size={30} color="#fff" />
-          <Text style={styles.navText}>Каналы</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -173,7 +146,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   channelList: {
-    paddingBottom: 100, // Увеличим отступ для нижней навигации
+    paddingBottom: 100, // Оставляем место для нижней навигации
   },
   channelCard: {
     backgroundColor: '#1a1a1a',
@@ -211,26 +184,5 @@ const styles = StyleSheet.create({
   description: {
     color: '#ccc',
     fontSize: 14,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 20, // Приподнимаем панель навигации
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#1a1a1a',
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  navButton: {
-    alignItems: 'center',
-  },
-  navText: {
-    color: '#fff',
-    fontSize: 12,
-    marginTop: 5,
   },
 });

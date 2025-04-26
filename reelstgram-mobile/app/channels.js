@@ -127,8 +127,8 @@ const styles = StyleSheet.create({
   },
   createChannelButton: {
     position: 'absolute',
-    bottom: 80, // Перемещаем кнопку выше панели навигации
-    right: 20,
+    bottom: 100, // Поднимаем кнопку выше
+    right: 40, // Смещаем левее
     backgroundColor: '#2ecc71',
     width: 40,
     height: 40,

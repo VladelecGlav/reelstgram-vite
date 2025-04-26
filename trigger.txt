@@ -1,1 +1,1 @@
-"Trigger Vercel deploy" 
+"Trigger Vercel deploy after settings check" 

@@ -2,21 +2,12 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import analytics from '@react-native-firebase/analytics';
 
-export default function MenuScreen() {
+export default function ChannelsScreen() {
   const router = useRouter();
   const [channels, setChannels] = useState([]);
 
   useEffect(() => {
-    const logScreenView = async () => {
-      await analytics().logScreenView({
-        screen_name: 'Menu',
-        screen_class: 'MenuScreen',
-      });
-    };
-    logScreenView();
-
     const loadChannels = async () => {
       let savedChannels = await AsyncStorage.getItem('channels');
       if (savedChannels) {
@@ -26,16 +17,11 @@ export default function MenuScreen() {
     loadChannels();
   }, []);
 
-  const handleSelectChannel = async (channel) => {
-    await analytics().logEvent('select_channel_from_menu', {
-      channel_id: channel.uniqueId,
-      channel_name: channel.name,
-    });
+  const handleSelectChannel = (channel) => {
     router.push(`/channel/${channel.uniqueId}`);
   };
 
-  const handleBackToHome = async () => {
-    await analytics().logEvent('back_to_home_from_menu', {});
+  const handleBackToHome = () => {
     router.push('/');
   };
 
@@ -59,8 +45,7 @@ export default function MenuScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Menu</Text>
-      <Text style={styles.sectionTitle}>All Channels</Text>
+      <Text style={styles.title}>Channels</Text>
       {channels.length === 0 ? (
         <Text style={styles.noChannels}>No channels yet. Create one!</Text>
       ) : (
@@ -95,15 +80,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
-  },
   noChannels: {
     color: '#aaa',
     textAlign: 'center',
+    marginTop: 20,
+    fontSize: 18,
   },
   channelList: {
     paddingBottom: 20,
@@ -150,7 +131,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 20,
+    marginVertical: 20,
   },
   backButtonText: {
     color: '#fff',

@@ -1,22 +1,15 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import analytics from '@react-native-firebase/analytics';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function WelcomeScreen() {
+export default function SubscribedChannelsScreen() {
   const router = useRouter();
   const [channels, setChannels] = useState([]);
+  const [currentUser] = useState('default-user'); // Для примера
 
   useEffect(() => {
-    const logScreenView = async () => {
-      await analytics().logScreenView({
-        screen_name: 'Welcome',
-        screen_class: 'WelcomeScreen',
-      });
-    };
-    logScreenView();
-
     const loadChannels = async () => {
       let savedChannels = await AsyncStorage.getItem('channels');
       if (!savedChannels) {
@@ -75,26 +68,27 @@ export default function WelcomeScreen() {
     loadChannels();
   }, []);
 
-  const popularChannels = channels
-    .sort((a, b) => b.subscribers - a.subscribers)
-    .slice(0, 5);
+  // Фильтруем только подписанные каналы для текущего пользователя
+  const subscribedChannels = channels.filter((channel) => channel.subscribed);
 
-  const handleSelectChannel = async (channel) => {
-    await analytics().logEvent('select_channel', {
-      channel_id: channel.uniqueId,
-      channel_name: channel.name,
-    });
+  const handleSelectChannel = (channel) => {
     router.push(`/channel/${channel.uniqueId}`);
   };
 
-  const handleOpenMenu = async () => {
-    await analytics().logEvent('open_menu', {});
-    router.push('/menu');
+  const handleCreateChannel = () => {
+    router.push('/create-channel');
   };
 
-  const handleCreateChannel = async () => {
-    await analytics().logEvent('create_channel_start', {});
-    router.push('/create-channel');
+  const handleSettings = () => {
+    router.push('/settings');
+  };
+
+  const handleProfile = () => {
+    router.push('/profile');
+  };
+
+  const handleChannels = () => {
+    router.push('/channels');
   };
 
   const renderChannel = ({ item }) => (
@@ -118,30 +112,35 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={handleOpenMenu}
-        style={styles.menuButton}
-      >
-        <Text style={styles.menuButtonText}>☰</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
         onPress={handleCreateChannel}
         style={styles.createChannelButton}
       >
         <Text style={styles.createChannelButtonText}>+</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>Welcome to Reelstgram!</Text>
-      <Text style={styles.subtitle}>Discover and share amazing content in our channels.</Text>
-      <Text style={styles.sectionTitle}>Popular Channels</Text>
-      {popularChannels.length === 0 ? (
-        <Text style={styles.noChannels}>No channels yet. Create one!</Text>
+      {subscribedChannels.length === 0 ? (
+        <Text style={styles.noChannels}>No subscribed channels. Create one!</Text>
       ) : (
         <FlatList
-          data={popularChannels}
+          data={subscribedChannels}
           renderItem={renderChannel}
           keyExtractor={(item) => item.uniqueId}
           contentContainerStyle={styles.channelList}
         />
       )}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity onPress={handleSettings} style={styles.navButton}>
+          <Ionicons name="settings-outline" size={30} color="#fff" />
+          <Text style={styles.navText}>Settings</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleProfile} style={styles.navButton}>
+          <Ionicons name="person-outline" size={30} color="#fff" />
+          <Text style={styles.navText}>Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleChannels} style={styles.navButton}>
+          <Ionicons name="chatbubbles-outline" size={30} color="#fff" />
+          <Text style={styles.navText}>Channels</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -152,20 +151,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingTop: 50,
     paddingHorizontal: 20,
-  },
-  menuButton: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    backgroundColor: '#1e90ff',
-    padding: 10,
-    borderRadius: 5,
-    zIndex: 10,
-  },
-  menuButtonText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
   },
   createChannelButton: {
     position: 'absolute',
@@ -181,31 +166,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#aaa',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
-  },
   noChannels: {
     color: '#aaa',
     textAlign: 'center',
+    marginTop: 20,
+    fontSize: 18,
   },
   channelList: {
-    paddingBottom: 20,
+    paddingBottom: 80, // Оставляем место для нижней навигации
   },
   channelCard: {
     backgroundColor: '#1a1a1a',
@@ -243,5 +211,25 @@ const styles = StyleSheet.create({
   description: {
     color: '#ccc',
     fontSize: 14,
+  },
+  bottomNav: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#1a1a1a',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
+  navButton: {
+    alignItems: 'center',
+  },
+  navText: {
+    color: '#fff',
+    fontSize: 12,
+    marginTop: 5,
   },
 });

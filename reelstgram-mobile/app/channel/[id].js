@@ -5,7 +5,6 @@ import { Video } from 'expo-av';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import analytics from '@react-native-firebase/analytics';
 
 // Утилита для преобразования текста с URL в кликабельные ссылки (упрощённая версия для React Native)
 const renderTextWithLinks = (text) => {
@@ -34,14 +33,6 @@ export default function ContentViewerScreen() {
   }));
 
   useEffect(() => {
-    const logScreenView = async () => {
-      await analytics().logScreenView({
-        screen_name: 'ChannelView',
-        screen_class: 'ContentViewerScreen',
-      });
-    };
-    logScreenView();
-
     const loadChannel = async () => {
       const channels = JSON.parse(await AsyncStorage.getItem('channels')) || [];
       const selectedChannel = channels.find((ch) => ch.uniqueId === id);
@@ -49,21 +40,10 @@ export default function ContentViewerScreen() {
         setChannel(selectedChannel);
         setPosts(selectedChannel.posts || []);
 
-        await analytics().logEvent('channel_view', {
-          channel_id: selectedChannel.uniqueId,
-          channel_name: selectedChannel.name,
-          user_id: currentUser,
-        });
-
         if (selectedChannel.posts.length > 0) {
           const viewKey = `${selectedChannel.uniqueId}-${selectedChannel.posts[currentIndex].id}`;
           if (!hasViewed[viewKey]) {
             setHasViewed((prev) => ({ ...prev, [viewKey]: true }));
-            await analytics().logEvent('post_view', {
-              post_id: selectedChannel.posts[currentIndex].id,
-              channel_id: selectedChannel.uniqueId,
-              user_id: currentUser,
-            });
           }
         }
       }
@@ -111,12 +91,6 @@ export default function ContentViewerScreen() {
       ch.uniqueId === channel.uniqueId ? { ...ch, posts: updatedPosts } : ch
     );
     await AsyncStorage.setItem('channels', JSON.stringify(updatedChannels));
-
-    await analytics().logEvent('like_post', {
-      post_id: postId,
-      channel_id: channel.uniqueId,
-      user_id: currentUser,
-    });
   };
 
   const handleAddComment = async (postId) => {
@@ -138,13 +112,6 @@ export default function ContentViewerScreen() {
       ch.uniqueId === channel.uniqueId ? { ...ch, posts: updatedPosts } : ch
     );
     await AsyncStorage.setItem('channels', JSON.stringify(updatedChannels));
-
-    await analytics().logEvent('add_comment', {
-      post_id: postId,
-      channel_id: channel.uniqueId,
-      user_id: currentUser,
-      comment_text: newComment,
-    });
 
     setNewComment('');
   };
@@ -172,44 +139,22 @@ export default function ContentViewerScreen() {
   const copyChannelLink = async () => {
     const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${channel.uniqueId}/post/0`;
     Alert.alert('Channel Link Copied', channelLink);
-
-    await analytics().logEvent('copy_channel_link', {
-      channel_id: channel.uniqueId,
-      channel_name: channel.name,
-      user_id: currentUser,
-    });
   };
 
-  const shareChannelLink = async () => {
+  const shareChannelLink = () => {
     const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${channel.uniqueId}/post/0`;
     Alert.alert('Share Channel', 'Share this link: ' + channelLink);
-
-    await analytics().logEvent('share_channel', {
-      channel_id: channel.uniqueId,
-      channel_name: channel.name,
-      user_id: currentUser,
-    });
   };
 
   const toggleChannelInfo = () => {
     setIsChannelInfoOpen(!isChannelInfoOpen);
   };
 
-  const handleAddContentClick = async () => {
+  const handleAddContentClick = () => {
     if (isOwnerOrAdmin) {
-      await analytics().logEvent('add_content_start', {
-        channel_id: channel.uniqueId,
-        user_id: currentUser,
-      });
       router.push(`/add-content/${channel.uniqueId}`);
     } else {
       setShowPermissionPrompt(true);
-
-      await analytics().logEvent('add_content_denied', {
-        channel_id: channel.uniqueId,
-        channel_name: channel.name,
-        user_id: currentUser,
-      });
     }
   };
 

@@ -8,6 +8,7 @@ import AddContent from './components/AddContent';
 import ContentViewer from './components/ContentViewer';
 import ChannelSettings from './components/ChannelSettings';
 import UserProfile from './components/UserProfile';
+import WelcomePage from './components/WelcomePage';
 
 function AppContent() {
   console.log("Step 4: App component initialized.");
@@ -385,6 +386,15 @@ function AppContent() {
           <Route
             path="/"
             element={
+              <WelcomePage
+                channels={channels}
+                handleSelectChannel={handleSelectChannel}
+              />
+            }
+          />
+          <Route
+            path="/channels"
+            element={
               <ChannelList
                 channels={channels}
                 handleSelectChannel={handleSelectChannel}
@@ -400,7 +410,7 @@ function AppContent() {
             element={
               <ContentViewer
                 channels={channels}
-                onBack={() => navigate('/')}
+                onBack={() => navigate('/channels')}
                 onLike={handleLike}
                 onView={handleView}
                 onOpenMenu={() => setIsMenuOpen(true)}
@@ -408,7 +418,7 @@ function AppContent() {
                 onOpenSettings={handleOpenSettings}
                 handleToggleSubscription={handleToggleSubscription}
                 user={user}
-                navigate={navigate} // Передаём navigate для обработки ссылок
+                navigate={navigate}
               />
             }
           />

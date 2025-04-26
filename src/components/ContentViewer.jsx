@@ -78,15 +78,17 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
       }
       setShowSubscribePrompt(!user.subscribedChannels.includes(newChannel.uniqueId));
 
-      logAnalyticsEvent('link_click', {
+      logAnalyticsEvent('channel_view', {
         channelId: uniqueId,
         channelName: newChannel.name,
+        userId: user.userId,
         timestamp: new Date().toISOString(),
       });
 
-      sendGA4Event('link_click', {
+      sendGA4Event('channel_view', {
         channel_id: uniqueId,
         channel_name: newChannel.name,
+        user_id: user.userId,
       });
     }
   }, [channels, uniqueId, postId, localNavigate, user]);
@@ -99,6 +101,19 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
         console.log("ContentViewer.jsx: Incrementing view for post:", post.id, "in channel:", uniqueId);
         onView(post.id, uniqueId);
         setHasViewed((prev) => ({ ...prev, [viewKey]: true }));
+
+        logAnalyticsEvent('post_view', {
+          postId: post.id,
+          channelId: uniqueId,
+          userId: user.userId,
+          timestamp: new Date().toISOString(),
+        });
+
+        sendGA4Event('post_view', {
+          post_id: post.id,
+          channel_id: uniqueId,
+          user_id: user.userId,
+        });
       }
     }
   }, [currentIndex, channel, onView, uniqueId]);
@@ -164,14 +179,27 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
   };
 
   const copyChannelLink = async () => {
-    const channelLink = `${window.location.origin}/#/channel/${uniqueId}/post/0`;
+    const telegramLink = `t.me/MyMiniAppBot?start=channel_${uniqueId}`;
     
     try {
-      await navigator.clipboard.writeText(channelLink);
+      await navigator.clipboard.writeText(telegramLink);
       alert('Channel link copied to clipboard!');
+
+      logAnalyticsEvent('copy_channel_link', {
+        channelId: uniqueId,
+        channelName: channel.name,
+        userId: user.userId,
+        timestamp: new Date().toISOString(),
+      });
+
+      sendGA4Event('copy_channel_link', {
+        channel_id: uniqueId,
+        channel_name: channel.name,
+        user_id: user.userId,
+      });
     } catch (err) {
       console.error('Failed to copy link:', err);
-      alert('Failed to copy link. Please copy it manually: ' + channelLink);
+      alert('Failed to copy link. Please copy it manually: ' + telegramLink);
     }
   };
 
@@ -181,6 +209,19 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(telegramLink)}&text=Check out this channel: ${channel.name}`);
       console.log('Sharing Telegram link:', telegramLink);
+
+      logAnalyticsEvent('share_channel', {
+        channelId: uniqueId,
+        channelName: channel.name,
+        userId: user.userId,
+        timestamp: new Date().toISOString(),
+      });
+
+      sendGA4Event('share_channel', {
+        channel_id: uniqueId,
+        channel_name: channel.name,
+        user_id: user.userId,
+      });
     } else {
       alert('Sharing is only available in Telegram Mini App.');
     }
@@ -193,12 +234,14 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
     logAnalyticsEvent('subscribe', {
       channelId: uniqueId,
       channelName: channel.name,
+      userId: user.userId,
       timestamp: new Date().toISOString(),
     });
 
     sendGA4Event('subscribe', {
       channel_id: uniqueId,
       channel_name: channel.name,
+      user_id: user.userId,
     });
   };
 
@@ -207,6 +250,19 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
       onAddContent(channel);
     } else {
       setShowPermissionPrompt(true);
+
+      logAnalyticsEvent('add_content_denied', {
+        channelId: uniqueId,
+        channelName: channel.name,
+        userId: user.userId,
+        timestamp: new Date().toISOString(),
+      });
+
+      sendGA4Event('add_content_denied', {
+        channel_id: uniqueId,
+        channel_name: channel.name,
+        user_id: user.userId,
+      });
     }
   };
 

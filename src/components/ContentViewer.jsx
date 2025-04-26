@@ -179,10 +179,10 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
   };
 
   const copyChannelLink = async () => {
-    const telegramLink = `t.me/MyMiniAppBot?start=channel_${uniqueId}`;
+    const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${uniqueId}/post/0`;
     
     try {
-      await navigator.clipboard.writeText(telegramLink);
+      await navigator.clipboard.writeText(channelLink);
       alert('Channel link copied to clipboard!');
 
       logAnalyticsEvent('copy_channel_link', {
@@ -199,31 +199,40 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
       });
     } catch (err) {
       console.error('Failed to copy link:', err);
-      alert('Failed to copy link. Please copy it manually: ' + telegramLink);
+      alert('Failed to copy link. Please copy it manually: ' + channelLink);
     }
   };
 
   const shareChannelLink = () => {
-    const telegramLink = `t.me/MyMiniAppBot?start=channel_${uniqueId}`;
-    
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(telegramLink)}&text=Check out this channel: ${channel.name}`);
-      console.log('Sharing Telegram link:', telegramLink);
+    const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${uniqueId}/post/0`;
+    const shareData = {
+      title: `Check out ${channel.name} on Reelstgram!`,
+      text: `Discover amazing content in ${channel.name}:`,
+      url: channelLink,
+    };
 
-      logAnalyticsEvent('share_channel', {
-        channelId: uniqueId,
-        channelName: channel.name,
-        userId: user.userId,
-        timestamp: new Date().toISOString(),
-      });
+    if (navigator.share) {
+      navigator.share(shareData)
+        .then(() => {
+          logAnalyticsEvent('share_channel', {
+            channelId: uniqueId,
+            channelName: channel.name,
+            userId: user.userId,
+            timestamp: new Date().toISOString(),
+          });
 
-      sendGA4Event('share_channel', {
-        channel_id: uniqueId,
-        channel_name: channel.name,
-        user_id: user.userId,
-      });
+          sendGA4Event('share_channel', {
+            channel_id: uniqueId,
+            channel_name: channel.name,
+            user_id: user.userId,
+          });
+        })
+        .catch((err) => {
+          console.error('Failed to share:', err);
+          alert('Failed to share. Copy the link manually: ' + channelLink);
+        });
     } else {
-      alert('Sharing is only available in Telegram Mini App.');
+      alert('Sharing is not supported on this device. Copy the link manually: ' + channelLink);
     }
   };
 
@@ -592,7 +601,7 @@ export default function ContentViewer({ channels, onBack, onLike, onView, onOpen
           Back
         </button>
         <div className="fixed top-5 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded z-50">
-          Пост {currentIndex + 1} из {channel.posts.length}
+          Post {currentIndex + 1} of {channel.posts.length}
         </div>
         <AnimatePresence initial={false} custom={direction}>
           <motion.div

@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function WelcomeScreen() {
-  const navigation = useNavigation();
+  const router = useRouter();
   const [channels, setChannels] = useState([]);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function WelcomeScreen() {
     .slice(0, 5);
 
   const handleSelectChannel = (channel) => {
-    navigation.navigate('ContentViewer', { channel });
+    router.push(`/channel/${channel.uniqueId}`);
   };
 
   const renderChannel = ({ item }) => (

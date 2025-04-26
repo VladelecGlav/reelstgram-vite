@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, TextInput, A
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Video } from 'expo-av';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
@@ -23,14 +23,14 @@ const logAnalyticsEvent = async (eventType, data) => {
 
 // Функция для отправки события в Google Analytics (если GA4 подключён через Firebase Analytics)
 const sendGA4Event = async (eventName, params) => {
-  // Для React Native мы будем использовать Firebase Analytics, но это требует настройки
   console.log('GA4 event sent (placeholder):', eventName, params);
 };
 
-export default function ContentViewerScreen({ route }) {
-  const { channel } = route.params;
-  const navigation = useNavigation();
-  const [posts, setPosts] = useState(channel.posts || []);
+export default function ContentViewerScreen() {
+  const { id } = useLocalSearchParams(); // Получаем параметр id из URL
+  const router = useRouter();
+  const [channel, setChannel] = useState(null);
+  const [posts, setPosts] = useState([]);
   const [newPostUrl, setNewPostUrl] = useState('');
   const [newPostCaption, setNewPostCaption] = useState('');
   const [newComment, setNewComment] = useState('');
@@ -47,39 +47,47 @@ export default function ContentViewerScreen({ route }) {
   }));
 
   useEffect(() => {
-    setPosts(channel.posts || []);
+    const loadChannel = async () => {
+      const channels = JSON.parse(await AsyncStorage.getItem('channels')) || [];
+      const selectedChannel = channels.find((ch) => ch.uniqueId === id);
+      if (selectedChannel) {
+        setChannel(selectedChannel);
+        setPosts(selectedChannel.posts || []);
 
-    logAnalyticsEvent('channel_view', {
-      channelId: channel.uniqueId,
-      channelName: channel.name,
-      userId: currentUser,
-      timestamp: new Date().toISOString(),
-    });
-
-    sendGA4Event('channel_view', {
-      channel_id: channel.uniqueId,
-      channel_name: channel.name,
-      user_id: currentUser,
-    });
-
-    if (posts.length > 0) {
-      const viewKey = `${channel.uniqueId}-${posts[currentIndex].id}`;
-      if (!hasViewed[viewKey]) {
-        setHasViewed((prev) => ({ ...prev, [viewKey]: true }));
-        logAnalyticsEvent('post_view', {
-          postId: posts[currentIndex].id,
-          channelId: channel.uniqueId,
+        logAnalyticsEvent('channel_view', {
+          channelId: selectedChannel.uniqueId,
+          channelName: selectedChannel.name,
           userId: currentUser,
           timestamp: new Date().toISOString(),
         });
-        sendGA4Event('post_view', {
-          post_id: posts[currentIndex].id,
-          channel_id: channel.uniqueId,
+
+        sendGA4Event('channel_view', {
+          channel_id: selectedChannel.uniqueId,
+          channel_name: selectedChannel.name,
           user_id: currentUser,
         });
+
+        if (selectedChannel.posts.length > 0) {
+          const viewKey = `${selectedChannel.uniqueId}-${selectedChannel.posts[currentIndex].id}`;
+          if (!hasViewed[viewKey]) {
+            setHasViewed((prev) => ({ ...prev, [viewKey]: true }));
+            logAnalyticsEvent('post_view', {
+              postId: selectedChannel.posts[currentIndex].id,
+              channelId: selectedChannel.uniqueId,
+              userId: currentUser,
+              timestamp: new Date().toISOString(),
+            });
+            sendGA4Event('post_view', {
+              post_id: selectedChannel.posts[currentIndex].id,
+              channel_id: selectedChannel.uniqueId,
+              user_id: currentUser,
+            });
+          }
+        }
       }
-    }
-  }, [channel, currentIndex, posts]);
+    };
+    loadChannel();
+  }, [id, currentIndex]);
 
   const handleAddPost = async () => {
     if (!newPostUrl || !newPostCaption) return;
@@ -191,7 +199,7 @@ export default function ContentViewerScreen({ route }) {
       }
     });
 
-  const isOwnerOrAdmin = channel.ownerId === currentUser || channel.admins.includes(currentUser);
+  const isOwnerOrAdmin = channel?.ownerId === currentUser || channel?.admins.includes(currentUser);
 
   const copyChannelLink = async () => {
     const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${channel.uniqueId}/post/0`;
@@ -235,8 +243,7 @@ export default function ContentViewerScreen({ route }) {
 
   const handleAddContentClick = () => {
     if (isOwnerOrAdmin) {
-      // Здесь можно добавить экран добавления контента
-      Alert.alert('Add Content', 'This feature is under development.');
+      router.push(`/add-content/${channel.uniqueId}`);
     } else {
       setShowPermissionPrompt(true);
 
@@ -254,6 +261,20 @@ export default function ContentViewerScreen({ route }) {
       });
     }
   };
+
+  if (!channel) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.noChannel}>Channel not found.</Text>
+        <TouchableOpacity
+          onPress={() => router.push('/')}
+          style={styles.backButton}
+        >
+          <Text style={styles.backButtonText}>Go to Home</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   if (posts.length === 0) {
     return (
@@ -293,7 +314,7 @@ export default function ContentViewerScreen({ route }) {
         )}
 
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => router.push('/')}
           style={styles.backButton}
         >
           <Text style={styles.backButtonText}>Back</Text>
@@ -414,7 +435,7 @@ export default function ContentViewerScreen({ route }) {
       )}
 
       <TouchableOpacity
-        onPress={() => navigation.goBack()}
+        onPress={() => router.push('/')}
         style={styles.backButton}
       >
         <Text style={styles.backButtonText}>Back</Text>
@@ -667,6 +688,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   noPosts: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  noChannel: {
     color: '#fff',
     fontSize: 18,
     textAlign: 'center',

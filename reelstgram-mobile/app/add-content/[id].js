@@ -50,7 +50,7 @@ export default function AddContentScreen() {
   };
 
   const handleCancel = () => {
-    router.back();
+    router.push('/channels');
   };
 
   if (!channel) {
@@ -58,7 +58,7 @@ export default function AddContentScreen() {
       <View style={styles.container}>
         <Text style={styles.noChannel}>Канал не найден.</Text>
         <TouchableOpacity
-          onPress={() => router.push('/')}
+          onPress={() => router.push('/channels')}
           style={styles.backButton}
         >
           <Text style={styles.backButtonText}>Вернуться на главную</Text>

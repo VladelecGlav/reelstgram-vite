@@ -157,7 +157,7 @@ export default function ContentViewerScreen() {
       <View style={styles.container}>
         <Text style={styles.noChannel}>Канал не найден.</Text>
         <TouchableOpacity
-          onPress={() => router.push('/')}
+          onPress={() => router.push('/channels')}
           style={styles.backButton}
         >
           <Text style={styles.backButtonText}>Вернуться на главную</Text>
@@ -203,7 +203,7 @@ export default function ContentViewerScreen() {
         )}
 
         <TouchableOpacity
-          onPress={() => router.push('/')}
+          onPress={() => router.push('/channels')}
           style={styles.backButton}
         >
           <Text style={styles.backButtonText}>Вернуться</Text>
@@ -323,7 +323,7 @@ export default function ContentViewerScreen() {
       )}
 
       <TouchableOpacity
-        onPress={() => router.push('/')}
+        onPress={() => router.push('/channels')}
         style={styles.backButton}
       >
         <Text style={styles.backButtonText}>Вернуться</Text>

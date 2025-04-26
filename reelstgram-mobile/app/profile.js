@@ -32,7 +32,7 @@ export default function ProfileScreen() {
   };
 
   const handleBackToHome = () => {
-    router.push('/');
+    router.push('/channels');
   };
 
   return (
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: 'bold',
     color: '#fff',
-    textAlign: 'center',
     marginBottom: 20,
+    textAlign: 'center',
   },
   infoContainer: {
     marginTop: 20,

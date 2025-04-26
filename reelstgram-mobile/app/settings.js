@@ -5,7 +5,7 @@ export default function SettingsScreen() {
   const router = useRouter();
 
   const handleBackToHome = () => {
-    router.push('/');
+    router.push('/channels');
   };
 
   return (

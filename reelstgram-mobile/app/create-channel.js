@@ -36,7 +36,7 @@ export default function CreateChannelScreen() {
   };
 
   const handleCancel = () => {
-    router.back();
+    router.push('/channels');
   };
 
   return (

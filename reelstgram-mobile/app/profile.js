@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingTop: 50,
     paddingHorizontal: 20,
-    paddingBottom: 100, // Оставляем место для нижней навигации
   },
   title: {
     fontSize: 36,
@@ -137,6 +136,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
+    marginBottom: 80, // Устанавливаем отступ, чтобы кнопка была выше панели навигации
   },
   cancelButtonText: {
     color: '#fff',
@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
+    marginBottom: 80, // Устанавливаем отступ, чтобы кнопка была выше панели навигации
   },
   backButtonText: {
     color: '#fff',

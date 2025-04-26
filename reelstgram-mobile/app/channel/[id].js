@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   postContainer: {
     flex: 1,
     paddingTop: 100,
-    paddingBottom: 100, // Оставляем место для нижней навигации
+    paddingBottom: 80, // Уменьшаем отступ, так как панель стала компактнее
   },
   postCard: {
     backgroundColor: '#1a1a1a',
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
   },
   addContentButton: {
     position: 'absolute',
-    bottom: 100, // Приподнимаем кнопку над навигацией
+    bottom: 80, // Приподнимаем кнопку над навигацией
     right: 20,
     backgroundColor: '#2ecc71',
     padding: 15,

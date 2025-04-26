@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   channelList: {
-    paddingBottom: 100, // Оставляем место для нижней навигации
+    paddingBottom: 80, // Уменьшаем отступ, так как панель стала компактнее
   },
   channelCard: {
     backgroundColor: '#1a1a1a',

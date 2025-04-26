@@ -31,7 +31,7 @@ export default function RootLayout() {
           >
             <Ionicons
               name="settings-outline"
-              size={30}
+              size={24}
               color={pathname === '/settings' ? '#1e90ff' : '#fff'}
             />
             <Text
@@ -49,7 +49,7 @@ export default function RootLayout() {
           >
             <Ionicons
               name="person-outline"
-              size={30}
+              size={24}
               color={pathname === '/profile' ? '#1e90ff' : '#fff'}
             />
             <Text
@@ -67,7 +67,7 @@ export default function RootLayout() {
           >
             <Ionicons
               name="chatbubbles-outline"
-              size={30}
+              size={24}
               color={pathname === '/channels' ? '#1e90ff' : '#fff'}
             />
             <Text
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: '#1a1a1a',
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#333',
@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
   },
   navText: {
     color: '#fff',
-    fontSize: 12,
-    marginTop: 5,
+    fontSize: 10,
+    marginTop: 3,
   },
   activeNavText: {
     color: '#1e90ff',

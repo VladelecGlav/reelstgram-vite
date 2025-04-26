@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   channelList: {
-    paddingBottom: 100, // Оставляем место для нижней навигации
+    paddingBottom: 80, // Уменьшаем отступ, так как панель стала компактнее
   },
   channelCard: {
     backgroundColor: '#1a1a1a',
@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginVertical: 20,
+    marginBottom: 80, // Устанавливаем отступ, чтобы кнопка была выше панели навигации
   },
   backButtonText: {
     color: '#fff',

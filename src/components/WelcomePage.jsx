@@ -17,7 +17,7 @@ export default function WelcomePage({ channels, handleSelectChannel }) {
         className="text-center px-4"
       >
         <h1 className="text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-          Welcome to Reelstgram!
+          Welcome to Channel!
         </h1>
         <p className="text-lg mb-6 text-gray-300">Discover and share amazing content in our channels.</p>
         <h2 className="text-3xl font-semibold mb-4 text-gray-100">Popular Channels</h2>

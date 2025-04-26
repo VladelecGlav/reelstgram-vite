@@ -36,7 +36,7 @@ export default function ChannelsScreen() {
         </View>
         <View>
           <Text style={styles.channelName}>{item.name}</Text>
-          <Text style={styles.subscribers}>{item.subscribers.toLocaleString()} subscribers</Text>
+          <Text style={styles.subscribers}>{item.subscribers.toLocaleString()} подписчиков</Text>
         </View>
       </View>
       <Text style={styles.description} numberOfLines={1}>{item.description}</Text>
@@ -45,9 +45,9 @@ export default function ChannelsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Channels</Text>
+      <Text style={styles.title}>Каналы</Text>
       {channels.length === 0 ? (
-        <Text style={styles.noChannels}>No channels yet. Create one!</Text>
+        <Text style={styles.noChannels}>Пока нет каналов. Создайте один!</Text>
       ) : (
         <FlatList
           data={channels}
@@ -60,7 +60,7 @@ export default function ChannelsScreen() {
         onPress={handleBackToHome}
         style={styles.backButton}
       >
-        <Text style={styles.backButtonText}>Back to Home</Text>
+        <Text style={styles.backButtonText}>Вернуться на главную</Text>
       </TouchableOpacity>
     </View>
   );

@@ -21,14 +21,14 @@ export default function ProfileScreen() {
 
   const handleSaveUsername = async () => {
     if (!newUsername) {
-      Alert.alert('Error', 'Please enter a username.');
+      Alert.alert('Ошибка', 'Пожалуйста, введите имя пользователя.');
       return;
     }
 
     await AsyncStorage.setItem('username', newUsername);
     setUsername(newUsername);
     setIsEditing(false);
-    Alert.alert('Success', 'Username updated successfully!');
+    Alert.alert('Успех', 'Имя пользователя успешно обновлено!');
   };
 
   const handleBackToHome = () => {
@@ -37,29 +37,29 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.title}>Профиль</Text>
       {isEditing ? (
         <View style={styles.editContainer}>
           <TextInput
             value={newUsername}
             onChangeText={setNewUsername}
-            placeholder="Enter new username"
+            placeholder="Введите новое имя пользователя"
             placeholderTextColor="#aaa"
             style={styles.input}
           />
           <TouchableOpacity onPress={handleSaveUsername} style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>Save</Text>
+            <Text style={styles.saveButtonText}>Сохранить</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setIsEditing(false)} style={styles.cancelButton}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
+            <Text style={styles.cancelButtonText}>Отмена</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.infoContainer}>
-          <Text style={styles.label}>Username:</Text>
+          <Text style={styles.label}>Имя пользователя:</Text>
           <Text style={styles.value}>{username}</Text>
           <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.editButton}>
-            <Text style={styles.editButtonText}>Edit Profile</Text>
+            <Text style={styles.editButtonText}>Редактировать профиль</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -67,7 +67,7 @@ export default function ProfileScreen() {
         onPress={handleBackToHome}
         style={styles.backButton}
       >
-        <Text style={styles.backButtonText}>Back to Home</Text>
+        <Text style={styles.backButtonText}>Вернуться на главную</Text>
       </TouchableOpacity>
     </View>
   );

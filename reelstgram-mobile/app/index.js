@@ -17,8 +17,8 @@ export default function SubscribedChannelsScreen() {
           {
             id: 1,
             uniqueId: 'channel1',
-            name: 'Channel 1',
-            description: 'Welcome to Channel 1!',
+            name: 'Канал 1',
+            description: 'Добро пожаловать в Канал 1!',
             avatar: '',
             subscribed: true,
             subscribers: 150,
@@ -29,7 +29,7 @@ export default function SubscribedChannelsScreen() {
                 id: 1,
                 url: 'https://example.com/image1.jpg',
                 type: 'image',
-                caption: 'First post in Channel 1',
+                caption: 'Первый пост в Канале 1',
                 likes: 5,
                 views: 10,
                 buttons: [],
@@ -40,8 +40,8 @@ export default function SubscribedChannelsScreen() {
           {
             id: 2,
             uniqueId: 'channel2',
-            name: 'Channel 2',
-            description: 'Welcome to Channel 2!',
+            name: 'Канал 2',
+            description: 'Добро пожаловать в Канал 2!',
             avatar: '',
             subscribed: true,
             subscribers: 200,
@@ -52,7 +52,7 @@ export default function SubscribedChannelsScreen() {
                 id: 1,
                 url: 'https://example.com/image2.jpg',
                 type: 'image',
-                caption: 'First post in Channel 2',
+                caption: 'Первый пост в Канале 2',
                 likes: 3,
                 views: 8,
                 buttons: [],
@@ -102,7 +102,7 @@ export default function SubscribedChannelsScreen() {
         </View>
         <View>
           <Text style={styles.channelName}>{item.name}</Text>
-          <Text style={styles.subscribers}>{item.subscribers.toLocaleString()} subscribers</Text>
+          <Text style={styles.subscribers}>{item.subscribers.toLocaleString()} подписчиков</Text>
         </View>
       </View>
       <Text style={styles.description} numberOfLines={1}>{item.description}</Text>
@@ -118,7 +118,7 @@ export default function SubscribedChannelsScreen() {
         <Text style={styles.createChannelButtonText}>+</Text>
       </TouchableOpacity>
       {subscribedChannels.length === 0 ? (
-        <Text style={styles.noChannels}>No subscribed channels. Create one!</Text>
+        <Text style={styles.noChannels}>Пока нет каналов. Создайте один!</Text>
       ) : (
         <FlatList
           data={subscribedChannels}
@@ -130,15 +130,15 @@ export default function SubscribedChannelsScreen() {
       <View style={styles.bottomNav}>
         <TouchableOpacity onPress={handleSettings} style={styles.navButton}>
           <Ionicons name="settings-outline" size={30} color="#fff" />
-          <Text style={styles.navText}>Settings</Text>
+          <Text style={styles.navText}>Настройки</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleProfile} style={styles.navButton}>
           <Ionicons name="person-outline" size={30} color="#fff" />
-          <Text style={styles.navText}>Profile</Text>
+          <Text style={styles.navText}>Профиль</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleChannels} style={styles.navButton}>
           <Ionicons name="chatbubbles-outline" size={30} color="#fff" />
-          <Text style={styles.navText}>Channels</Text>
+          <Text style={styles.navText}>Каналы</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   channelList: {
-    paddingBottom: 80, // Оставляем место для нижней навигации
+    paddingBottom: 100, // Увеличим отступ для нижней навигации
   },
   channelCard: {
     backgroundColor: '#1a1a1a',
@@ -214,15 +214,16 @@ const styles = StyleSheet.create({
   },
   bottomNav: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    bottom: 20, // Приподнимаем панель навигации
+    left: 20,
+    right: 20,
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: '#1a1a1a',
     paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#333',
   },
   navButton: {
     alignItems: 'center',

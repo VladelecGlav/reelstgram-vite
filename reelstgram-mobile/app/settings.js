@@ -10,13 +10,13 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
-      <Text style={styles.message}>Settings screen is under development.</Text>
+      <Text style={styles.title}>Настройки</Text>
+      <Text style={styles.message}>Экран настроек в разработке.</Text>
       <TouchableOpacity
         onPress={handleBackToHome}
         style={styles.backButton}
       >
-        <Text style={styles.backButtonText}>Back to Home</Text>
+        <Text style={styles.backButtonText}>Вернуться на главную</Text>
       </TouchableOpacity>
     </View>
   );

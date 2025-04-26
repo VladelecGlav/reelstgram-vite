@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { nanoid } from 'nanoid/non-secure';
@@ -12,7 +12,7 @@ export default function CreateChannelScreen() {
 
   const handleCreateChannel = async () => {
     if (!name || !description) {
-      Alert.alert('Error', 'Please fill in both name and description.');
+      Alert.alert('Ошибка', 'Пожалуйста, заполните название и описание.');
       return;
     }
 
@@ -33,7 +33,7 @@ export default function CreateChannelScreen() {
     const updatedChannels = [...channels, newChannel];
     await AsyncStorage.setItem('channels', JSON.stringify(updatedChannels));
 
-    Alert.alert('Success', 'Channel created successfully!');
+    Alert.alert('Успех', 'Канал успешно создан!');
     router.back();
   };
 
@@ -43,27 +43,27 @@ export default function CreateChannelScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create a New Channel</Text>
+      <Text style={styles.title}>Создать новый канал</Text>
       <TextInput
         value={name}
         onChangeText={setName}
-        placeholder="Channel Name"
+        placeholder="Название канала"
         placeholderTextColor="#aaa"
         style={styles.input}
       />
       <TextInput
         value={description}
         onChangeText={setDescription}
-        placeholder="Description"
+        placeholder="Описание"
         placeholderTextColor="#aaa"
         style={styles.input}
         multiline
       />
       <TouchableOpacity onPress={handleCreateChannel} style={styles.createButton}>
-        <Text style={styles.createButtonText}>Create Channel</Text>
+        <Text style={styles.createButtonText}>Создать канал</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-        <Text style={styles.cancelButtonText}>Cancel</Text>
+        <Text style={styles.cancelButtonText}>Отмена</Text>
       </TouchableOpacity>
     </View>
   );

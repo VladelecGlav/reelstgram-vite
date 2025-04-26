@@ -8,7 +8,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 
 // Утилита для преобразования текста с URL в кликабельные ссылки (упрощённая версия для React Native)
 const renderTextWithLinks = (text) => {
-  if (!text) return 'No description available.';
+  if (!text) return 'Описание отсутствует.';
   return text; // Для React Native мы не будем делать кликабельные ссылки, так как это требует дополнительных компонентов
 };
 
@@ -138,12 +138,12 @@ export default function ContentViewerScreen() {
 
   const copyChannelLink = async () => {
     const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${channel.uniqueId}/post/0`;
-    Alert.alert('Channel Link Copied', channelLink);
+    Alert.alert('Ссылка скопирована', channelLink);
   };
 
   const shareChannelLink = () => {
     const channelLink = `https://reelstgram-vite.vercel.app/#/channel/${channel.uniqueId}/post/0`;
-    Alert.alert('Share Channel', 'Share this link: ' + channelLink);
+    Alert.alert('Поделиться каналом', 'Поделитесь этой ссылкой: ' + channelLink);
   };
 
   const toggleChannelInfo = () => {
@@ -161,12 +161,12 @@ export default function ContentViewerScreen() {
   if (!channel) {
     return (
       <View style={styles.container}>
-        <Text style={styles.noChannel}>Channel not found.</Text>
+        <Text style={styles.noChannel}>Канал не найден.</Text>
         <TouchableOpacity
           onPress={() => router.push('/')}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>Go to Home</Text>
+          <Text style={styles.backButtonText}>Вернуться на главную</Text>
         </TouchableOpacity>
       </View>
     );
@@ -181,7 +181,7 @@ export default function ContentViewerScreen() {
           </View>
           <View>
             <Text style={styles.title}>{channel.name}</Text>
-            <Text style={styles.subscribers}>{channel.subscribers.toLocaleString()} subscribers</Text>
+            <Text style={styles.subscribers}>{channel.subscribers.toLocaleString()} подписчиков</Text>
           </View>
         </TouchableOpacity>
 
@@ -198,12 +198,12 @@ export default function ContentViewerScreen() {
                 <Text style={styles.modalTitle}>{channel.name}</Text>
               </View>
               <Text style={styles.modalDescription}>{renderTextWithLinks(channel.description)}</Text>
-              <Text style={styles.modalSubscribers}>{channel.subscribers.toLocaleString()} subscribers</Text>
+              <Text style={styles.modalSubscribers}>{channel.subscribers.toLocaleString()} подписчиков</Text>
               <TouchableOpacity onPress={copyChannelLink} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Copy Channel Link</Text>
+                <Text style={styles.modalButtonText}>Скопировать ссылку на канал</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={shareChannelLink} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Share Channel</Text>
+                <Text style={styles.modalButtonText}>Поделиться каналом</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -213,25 +213,25 @@ export default function ContentViewerScreen() {
           onPress={() => router.push('/')}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>Back</Text>
+          <Text style={styles.backButtonText}>Вернуться</Text>
         </TouchableOpacity>
-        <Text style={styles.noPosts}>No posts yet. Add some content!</Text>
+        <Text style={styles.noPosts}>Пока нет постов. Добавьте контент!</Text>
         <TouchableOpacity onPress={handleAddContentClick} style={styles.addContentButton}>
-          <Text style={styles.addContentButtonText}>Add Content</Text>
+          <Text style={styles.addContentButtonText}>Добавить контент</Text>
         </TouchableOpacity>
 
         {showPermissionPrompt && (
           <View style={styles.modalOverlay}>
             <View style={styles.modal}>
-              <Text style={styles.modalTitle}>Permission Denied</Text>
+              <Text style={styles.modalTitle}>Доступ запрещён</Text>
               <Text style={styles.modalDescription}>
-                Only the channel owner or administrators can add content.
+                Только владелец канала или администраторы могут добавлять контент.
               </Text>
               <TouchableOpacity
                 onPress={() => setShowPermissionPrompt(false)}
                 style={styles.modalButton}
               >
-                <Text style={styles.modalButtonText}>Close</Text>
+                <Text style={styles.modalButtonText}>Закрыть</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -260,11 +260,11 @@ export default function ContentViewerScreen() {
         <TouchableOpacity onPress={() => handleLike(item.id)} style={styles.actionButton}>
           <Text style={styles.actionText}>❤️ {item.likes}</Text>
         </TouchableOpacity>
-        <Text style={styles.views}>{item.views} views</Text>
+        <Text style={styles.views}>{item.views} просмотров</Text>
       </View>
 
       <View style={styles.comments}>
-        <Text style={styles.commentTitle}>Comments</Text>
+        <Text style={styles.commentTitle}>Комментарии</Text>
         {item.comments && item.comments.length > 0 ? (
           item.comments.map((comment, index) => (
             <View key={index} style={styles.comment}>
@@ -273,13 +273,13 @@ export default function ContentViewerScreen() {
             </View>
           ))
         ) : (
-          <Text style={styles.noComments}>No comments yet.</Text>
+          <Text style={styles.noComments}>Пока нет комментариев.</Text>
         )}
         <View style={styles.commentInputContainer}>
           <TextInput
             value={newComment}
             onChangeText={setNewComment}
-            placeholder="Add a comment..."
+            placeholder="Добавить комментарий..."
             placeholderTextColor="#aaa"
             style={styles.commentInput}
           />
@@ -287,7 +287,7 @@ export default function ContentViewerScreen() {
             onPress={() => handleAddComment(item.id)}
             style={styles.commentButton}
           >
-            <Text style={styles.commentButtonText}>Comment</Text>
+            <Text style={styles.commentButtonText}>Комментировать</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -302,7 +302,7 @@ export default function ContentViewerScreen() {
         </View>
         <View>
           <Text style={styles.title}>{channel.name}</Text>
-          <Text style={styles.subscribers}>{channel.subscribers.toLocaleString()} subscribers</Text>
+          <Text style={styles.subscribers}>{channel.subscribers.toLocaleString()} подписчиков</Text>
         </View>
       </TouchableOpacity>
 
@@ -319,12 +319,12 @@ export default function ContentViewerScreen() {
               <Text style={styles.modalTitle}>{channel.name}</Text>
             </View>
             <Text style={styles.modalDescription}>{renderTextWithLinks(channel.description)}</Text>
-            <Text style={styles.modalSubscribers}>{channel.subscribers.toLocaleString()} subscribers</Text>
+            <Text style={styles.modalSubscribers}>{channel.subscribers.toLocaleString()} подписчиков</Text>
             <TouchableOpacity onPress={copyChannelLink} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Copy Channel Link</Text>
+              <Text style={styles.modalButtonText}>Скопировать ссылку на канал</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={shareChannelLink} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Share Channel</Text>
+              <Text style={styles.modalButtonText}>Поделиться каналом</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -334,10 +334,10 @@ export default function ContentViewerScreen() {
         onPress={() => router.push('/')}
         style={styles.backButton}
       >
-        <Text style={styles.backButtonText}>Back</Text>
+        <Text style={styles.backButtonText}>Вернуться</Text>
       </TouchableOpacity>
       <Text style={styles.postCounter}>
-        Post {currentIndex + 1} of {posts.length}
+        Пост {currentIndex + 1} из {posts.length}
       </Text>
 
       <GestureDetector gesture={panGesture}>
@@ -347,21 +347,21 @@ export default function ContentViewerScreen() {
       </GestureDetector>
 
       <TouchableOpacity onPress={handleAddContentClick} style={styles.addContentButton}>
-        <Text style={styles.addContentButtonText}>Add Content</Text>
+        <Text style={styles.addContentButtonText}>Добавить контент</Text>
       </TouchableOpacity>
 
       {showPermissionPrompt && (
         <View style={styles.modalOverlay}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle}>Permission Denied</Text>
+            <Text style={styles.modalTitle}>Доступ запрещён</Text>
             <Text style={styles.modalDescription}>
-              Only the channel owner or administrators can add content.
+              Только владелец канала или администраторы могут добавлять контент.
             </Text>
             <TouchableOpacity
               onPress={() => setShowPermissionPrompt(false)}
               style={styles.modalButton}
             >
-              <Text style={styles.modalButtonText}>Close</Text>
+              <Text style={styles.modalButtonText}>Закрыть</Text>
             </TouchableOpacity>
           </View>
         </View>

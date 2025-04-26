@@ -23,7 +23,7 @@ export default function AddContentScreen() {
 
   const handleAddPost = async () => {
     if (!newPostUrl || !newPostCaption) {
-      Alert.alert('Error', 'Please fill in both URL and caption.');
+      Alert.alert('Ошибка', 'Пожалуйста, заполните URL и описание.');
       return;
     }
 
@@ -45,7 +45,7 @@ export default function AddContentScreen() {
     );
     await AsyncStorage.setItem('channels', JSON.stringify(updatedChannels));
 
-    Alert.alert('Success', 'Post added successfully!');
+    Alert.alert('Успех', 'Пост успешно добавлен!');
     router.back();
   };
 
@@ -56,12 +56,12 @@ export default function AddContentScreen() {
   if (!channel) {
     return (
       <View style={styles.container}>
-        <Text style={styles.noChannel}>Channel not found.</Text>
+        <Text style={styles.noChannel}>Канал не найден.</Text>
         <TouchableOpacity
           onPress={() => router.push('/')}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>Go to Home</Text>
+          <Text style={styles.backButtonText}>Вернуться на главную</Text>
         </TouchableOpacity>
       </View>
     );
@@ -69,26 +69,26 @@ export default function AddContentScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add New Post to {channel.name}</Text>
+      <Text style={styles.title}>Добавить новый пост в {channel.name}</Text>
       <TextInput
         value={newPostUrl}
         onChangeText={setNewPostUrl}
-        placeholder="Post URL (image or video)"
+        placeholder="URL поста (изображение или видео)"
         placeholderTextColor="#aaa"
         style={styles.input}
       />
       <TextInput
         value={newPostCaption}
         onChangeText={setNewPostCaption}
-        placeholder="Caption"
+        placeholder="Описание"
         placeholderTextColor="#aaa"
         style={styles.input}
       />
       <TouchableOpacity onPress={handleAddPost} style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add Post</Text>
+        <Text style={styles.addButtonText}>Добавить пост</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-        <Text style={styles.cancelButtonText}>Cancel</Text>
+        <Text style={styles.cancelButtonText}>Отмена</Text>
       </TouchableOpacity>
     </View>
   );
